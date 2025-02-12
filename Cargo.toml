@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+members = [
+    "cast_from_list",
+    "linalg",
+    "xor_nn_in_rust",
+]
