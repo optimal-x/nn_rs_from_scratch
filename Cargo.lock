@@ -6,6 +6,7 @@ version = 4
 name = "cast_from_list"
 version = "0.1.0"
 dependencies = [
+ "proc-macro2",
  "quote",
  "syn",
 ]
@@ -13,6 +14,9 @@ dependencies = [
 [[package]]
 name = "linalg"
 version = "0.1.0"
+dependencies = [
+ "cast_from_list",
+]
 
 [[package]]
 name = "proc-macro2"
