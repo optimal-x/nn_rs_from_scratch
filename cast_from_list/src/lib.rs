@@ -22,7 +22,7 @@ impl Into<Vec<Type>> for Args {
     }
 }
 
-pub(self) fn lowercasify_the_type(ty: &Type) -> Type {
+pub(self) fn type_lowercasification(ty: &Type) -> Type {
     if let Type::Path(TypePath { path, .. }) = ty {
         if let Some(ident) = path.get_ident() {
             let lower_ident = Ident::new(
@@ -80,7 +80,7 @@ pub fn casting_number(
         .map(|v| {
             v.into_iter()
                 .map(|(T, U)| {
-                    let lower_ty = lowercasify_the_type(U);
+                    let lower_ty = type_lowercasification(U);
                     quote! {
                         impl From<#T> for #U {
                             fn from(value: #T) -> Self {
