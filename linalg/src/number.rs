@@ -196,7 +196,6 @@ macro_rules! impl_ops {
                     Self(iter.map(|i| i.0).sum())
                 }
             }
-
         )*
     };
 }

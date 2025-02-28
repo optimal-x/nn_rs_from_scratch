@@ -1,5 +1,8 @@
-use crate::shape::Shape;
-use std::ops::*;
+use crate::{
+    number::{Number, NumberFuncs},
+    shape::Shape,
+};
+use std::{iter::Sum, ops::*};
 
 use super::ArrD;
 /// Owner of 1D-array data.
@@ -32,5 +35,22 @@ impl<T> ArrD<T, 2> for Arr2<T> {
 
     fn shape(&self) -> Shape<2> {
         Shape::from([self.len(), self[0].len()])
+    }
+}
+
+impl<T> Mul for Arr2<T>
+where
+    T: Number,
+    T: NumberFuncs,
+    T: Sum,
+    T: Copy,
+    T: Mul<Output = T>,
+    T: Add<Output = T>,
+    T: Sub<Output = T>,
+{
+    type Output = Arr2<T>;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        todo!()
     }
 }

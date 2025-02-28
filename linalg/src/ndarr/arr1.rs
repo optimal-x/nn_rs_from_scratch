@@ -36,7 +36,7 @@ where
     T: Add<Output = T>,
     T: Sub<Output = T>,
 {
-    fn distance(&self, rhs: &Self) -> T {
+    pub fn distance(&self, rhs: &Self) -> T {
         assert_eq!(self.0.len(), rhs.0.len());
         let s: T = self
             .0
@@ -47,7 +47,7 @@ where
         s.sqrt()
     }
 
-    fn manhattan(&self, rhs: &Self) -> T {
+    pub fn manhattan(&self, rhs: &Self) -> T {
         assert_eq!(self.0.len(), rhs.0.len());
         self.0
             .iter()
@@ -63,7 +63,7 @@ where
             .sum()
     }
 
-    fn inner_product(&self, rhs: &Self) -> T {
+    pub fn inner_product(&self, rhs: &Self) -> T {
         assert_eq!(self.0.len(), rhs.0.len());
         self.0.iter().zip(rhs.0.iter()).map(|(r, l)| *r * *l).sum()
     }
