@@ -1,16 +1,12 @@
-use crate::number::{Number, NumberFuncs};
-use std::iter::Sum;
+use crate::shape::Shape;
 use std::ops::*;
 
 use super::ArrD;
 /// Owner of 1D-array data.
 #[derive(Debug, Clone)]
-pub struct Arr2<T: Number>(Vec<Vec<T>>);
+pub struct Arr2<T>(Vec<Vec<T>>);
 
-impl<T> Deref for Arr2<T>
-where
-    T: Number,
-{
+impl<T> Deref for Arr2<T> {
     type Target = Vec<Vec<T>>;
 
     fn deref(&self) -> &Self::Target {
@@ -18,39 +14,23 @@ where
     }
 }
 
-impl<T> From<Vec<Vec<T>>> for Arr2<T>
-where
-    T: Number,
-{
+impl<T> From<Vec<Vec<T>>> for Arr2<T> {
     #[inline]
     fn from(value: Vec<Vec<T>>) -> Self {
         Self(value)
     }
 }
 
-impl<T> ArrD<T, 2> for Arr2<T>
-where
-    T: Number
-        + NumberFuncs
-        + Sum
-        + Copy
-        + Mul<Output = T>
-        + Add<Output = T>
-        + Sub<Output = T>,
-{
-    fn get(&self, x: &[usize]) -> Option<&T> {
-        todo!()
+impl<T> ArrD<T, 2> for Arr2<T> {
+    fn get(&self, indicies: &[usize]) -> Option<&T> {
+        assert_eq!(Self::DIMS, indicies.len());
+        match indicies[0] > self.len() && indicies[2] > self[0].len() {
+            true => None,
+            false => Some(&self[indicies[0]][indicies[1]]),
+        }
     }
 
-    fn dot(&self, rhs: &Self) -> T {
-        todo!()
-    }
-
-    fn manhattan(&self, rhs: &Self) -> T {
-        todo!()
-    }
-
-    fn distance(&self, rhs: &Self) -> T {
-        todo!()
+    fn shape(&self) -> Shape<2> {
+        Shape::from([self.len(), self[0].len()])
     }
 }

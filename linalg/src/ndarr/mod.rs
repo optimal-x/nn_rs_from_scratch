@@ -1,26 +1,11 @@
 pub mod arr1;
 pub mod arr2;
+pub mod nested_arr;
 
-use crate::number::Number;
+use crate::shape::Shape;
 
-pub trait ArrD<T: Number, const DIMS: usize> {
+pub trait ArrD<T, const DIMS: usize> {
     const DIMS: usize = DIMS;
-    fn get(&self, x: &[usize]) -> Option<&T>;
-    fn dot(&self, rhs: &Self) -> T;
-    fn manhattan(&self, rhs: &Self) -> T; // Manhattan distance
-    fn distance(&self, rhs: &Self) -> T; // Euclidean distance
+    fn get(&self, indicies: &[usize]) -> Option<&T>;
+    fn shape(&self) -> Shape<DIMS>;
 }
-
-// Handle to 1D-array data.
-// #[derive(Debug, Clone)]
-// pub struct Arr1Handle<T: Number>(Rc<Vec<T>>);
-
-// impl<T> From<&Vec<T>> for Arr1Handle<T>
-// where
-//     T: Number,
-// {
-//     #[inline]
-//     fn from(value: &Vec<T>) -> Self {
-//         Self(Rc::new(value.to_vec()))
-//     }
-// }

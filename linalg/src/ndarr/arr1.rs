@@ -1,16 +1,14 @@
+use super::ArrD;
 use crate::number::{Number, NumberFuncs};
+use crate::shape::Shape;
 use std::iter::Sum;
 use std::ops::*;
 
-use super::ArrD;
 /// Owner of 1D-array data.
 #[derive(Debug, Clone)]
-pub struct Arr1<T: Number>(Vec<T>);
+pub struct Arr1<T>(Vec<T>);
 
-impl<T> Deref for Arr1<T>
-where
-    T: Number,
-{
+impl<T> Deref for Arr1<T> {
     type Target = Vec<T>;
 
     fn deref(&self) -> &Self::Target {
@@ -28,15 +26,15 @@ where
     }
 }
 
-impl<T> ArrD<T, 1> for Arr1<T>
+impl<T> Arr1<T>
 where
-    T: Number
-        + NumberFuncs
-        + Sum
-        + Copy
-        + Mul<Output = T>
-        + Add<Output = T>
-        + Sub<Output = T>,
+    T: Number,
+    T: NumberFuncs,
+    T: Sum,
+    T: Copy,
+    T: Mul<Output = T>,
+    T: Add<Output = T>,
+    T: Sub<Output = T>,
 {
     fn distance(&self, rhs: &Self) -> T {
         assert_eq!(self.0.len(), rhs.0.len());
@@ -47,11 +45,6 @@ where
             .map(|(&r, &l)| (r - l) * (r - l))
             .sum();
         s.sqrt()
-    }
-
-    fn dot(&self, rhs: &Self) -> T {
-        assert_eq!(self.0.len(), rhs.0.len());
-        self.0.iter().zip(rhs.0.iter()).map(|(r, l)| *r * *l).sum()
     }
 
     fn manhattan(&self, rhs: &Self) -> T {
@@ -70,11 +63,22 @@ where
             .sum()
     }
 
+    fn inner_product(&self, rhs: &Self) -> T {
+        assert_eq!(self.0.len(), rhs.0.len());
+        self.0.iter().zip(rhs.0.iter()).map(|(r, l)| *r * *l).sum()
+    }
+}
+
+impl<T> ArrD<T, 1> for Arr1<T> {
     fn get(&self, indicies: &[usize]) -> Option<&T> {
         assert_eq!(Self::DIMS, indicies.len());
         match indicies[0] > self.len() {
             true => None,
-            false => Some(&(self as &Vec<_>)[indicies[0]]),
+            false => Some(&self[indicies[0]]),
         }
+    }
+
+    fn shape(&self) -> Shape<1> {
+        Shape::from([self.len()])
     }
 }
