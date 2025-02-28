@@ -1,7 +1,6 @@
 use super::ArrD;
 use crate::number::{Number, NumberFuncs};
 use crate::shape::Shape;
-use std::iter::Sum;
 use std::ops::*;
 
 /// Owner of 1D-array data.
@@ -26,17 +25,12 @@ where
     }
 }
 
-impl<T> Arr1<T>
-where
-    T: Number,
-    T: NumberFuncs,
-    T: Sum,
-    T: Copy,
-    T: Mul<Output = T>,
-    T: Add<Output = T>,
-    T: Sub<Output = T>,
-{
-    pub fn distance(&self, rhs: &Self) -> T {
+impl<T> Arr1<T> {
+    pub fn distance(&self, rhs: &Self) -> T
+    where
+        T: Number,
+        T: NumberFuncs,
+    {
         assert_eq!(self.0.len(), rhs.0.len());
         let s: T = self
             .0
@@ -47,7 +41,10 @@ where
         s.sqrt()
     }
 
-    pub fn manhattan(&self, rhs: &Self) -> T {
+    pub fn manhattan(&self, rhs: &Self) -> T
+    where
+        T: Number,
+    {
         assert_eq!(self.0.len(), rhs.0.len());
         self.0
             .iter()
@@ -63,7 +60,10 @@ where
             .sum()
     }
 
-    pub fn inner_product(&self, rhs: &Self) -> T {
+    pub fn inner_product(&self, rhs: &Self) -> T
+    where
+        T: Number,
+    {
         assert_eq!(self.0.len(), rhs.0.len());
         self.0.iter().zip(rhs.0.iter()).map(|(r, l)| *r * *l).sum()
     }
