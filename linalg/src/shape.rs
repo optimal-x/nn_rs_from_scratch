@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 ///.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Shape<const DIMS: usize>(pub [usize; DIMS]);
 
 impl<const DIMS: usize> Deref for Shape<DIMS> {

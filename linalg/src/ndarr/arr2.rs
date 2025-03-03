@@ -16,6 +16,52 @@ impl<T> Arr2<T> {
     pub fn cols(&self) -> usize {
         self.first().map_or(0, |row| row.len())
     }
+
+    pub fn matmul(self, rhs: Self) -> Self
+    where
+        T: Number,
+    {
+        let (m, n) = (self.rows(), self.cols());
+        let (n_rhs, p) = (rhs.rows(), rhs.cols());
+
+        // checking for at least 1 matching dim.
+        assert_eq!(
+            n, n_rhs,
+            "[[linalg]] Matrix multiplication dimensions mismatch"
+        );
+
+        let mut result = vec![vec![T::default(); p]; m];
+        for i in 0..m {
+            for j in 0..p {
+                result[i][j] = (0..n).map(|k| self[i][k] * rhs[k][j]).sum();
+            }
+        }
+
+        Arr2::from(result)
+    }
+
+    pub fn matadd(self, rhs: Self) -> Self
+    where
+        T: Number,
+    {
+        let lhs_shape = self.shape();
+        let rhs_shape = rhs.shape();
+        assert_eq!(
+            lhs_shape, rhs_shape,
+            "[[linalg]] Matrix Addition dimensions mismatch"
+        );
+
+        const M: usize = 0;
+        const N: usize = 1;
+
+        let mut collector: Vec<Vec<T>> = vec![Vec::with_capacity(N); M];
+        for i in 0..lhs_shape[M] {
+            for j in 0..lhs_shape[N] {
+                collector[i][j] = self[i][j] + rhs[i][j];
+            }
+        }
+        Arr2::from(collector)
+    }
 }
 
 impl<T> Deref for Arr2<T> {
@@ -55,22 +101,17 @@ where
     type Output = Arr2<T>;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        let (m, n) = (self.rows(), self.cols());
-        let (n_rhs, p) = (rhs.rows(), rhs.cols());
+        self.matmul(rhs)
+    }
+}
 
-        assert_eq!(
-            n, n_rhs,
-            "[[linalg]] Matrix multiplication dimensions mismatch"
-        );
+impl<T> Add for Arr2<T>
+where
+    T: Number,
+{
+    type Output = Arr2<T>;
 
-        let mut result = vec![vec![T::default(); p]; m];
-
-        (0..m).for_each(|i| {
-            (0..p).for_each(|j| {
-                result[i][j] = (0..n).map(|k| self[i][k] * rhs[k][j]).sum();
-            })
-        });
-
-        Arr2::from(result)
+    fn add(self, rhs: Self) -> Self::Output {
+        self.matadd(rhs)
     }
 }
