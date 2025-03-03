@@ -8,3 +8,4 @@ edition = "2021"
 # ndarray = "0.16.1"
 # polars = "0.43.1"
 cast_from_list = {path="../cast_from_list"}
+linalg = { path="../linalg" }

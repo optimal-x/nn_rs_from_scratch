@@ -98,7 +98,6 @@ where
     T: Number,
 {
     type Output = Arr2<T>;
-
     fn mul(self, rhs: Self) -> Self::Output {
         self.matmul(rhs)
     }
@@ -109,7 +108,6 @@ where
     T: Number,
 {
     type Output = Arr2<T>;
-
     fn add(self, rhs: Self) -> Self::Output {
         self.matadd(rhs)
     }

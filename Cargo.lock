@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "linalg"
-version = "0.3.2"
+version = "0.4.0"
 dependencies = [
  "cast_from_list",
 ]
@@ -58,4 +58,5 @@ name = "xor_nn_in_rust"
 version = "0.1.0"
 dependencies = [
  "cast_from_list",
+ "linalg",
 ]
