@@ -44,19 +44,18 @@ impl<T> Arr2<T> {
     where
         T: Number,
     {
-        let lhs_shape = self.shape();
-        let rhs_shape = rhs.shape();
+        let shape = self.shape();
         assert_eq!(
-            lhs_shape, rhs_shape,
+            shape,
+            rhs.shape(),
             "[[linalg]] Matrix Addition dimensions mismatch"
         );
 
-        const M: usize = 0;
-        const N: usize = 1;
+        let (m, n) = (shape[0], shape[1]);
 
-        let mut collector: Vec<Vec<T>> = vec![Vec::with_capacity(N); M];
-        for i in 0..lhs_shape[M] {
-            for j in 0..lhs_shape[N] {
+        let mut collector: Vec<Vec<T>> = vec![Vec::with_capacity(n); m];
+        for i in 0..m {
+            for j in 0..n {
                 collector[i][j] = self[i][j] + rhs[i][j];
             }
         }
@@ -82,7 +81,7 @@ impl<T> From<Vec<Vec<T>>> for Arr2<T> {
 
 impl<T> ArrD<T, 2> for Arr2<T> {
     fn get(&self, indicies: &[usize]) -> Option<&T> {
-        assert_eq!(Self::DIMS, indicies.len());
+        assert_eq!(self.axis(), indicies.len());
         match indicies[0] > self.len() && indicies[2] > self[0].len() {
             true => None,
             false => Some(&self[indicies[0]][indicies[1]]),
