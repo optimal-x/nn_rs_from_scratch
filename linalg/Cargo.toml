@@ -1,7 +1,11 @@
 [package]
 name = "linalg"
-version = "0.4.0"
-edition = "2021"
+version = "0.5.0"
+edition = "2024"
 
 [dependencies]
-cast_from_list = {path="../cast_from_list"}
+nnrs_macros = {path="../nnrs_macros"}
+eval-macro = "0.5.0"
+proc-macro2 = "1.0.93"
+quote = "1.0.38"
+syn = { version = "2.0.98", features = ["full"] }

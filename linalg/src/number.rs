@@ -1,11 +1,12 @@
-use cast_from_list::casting_number;
+#![allow(dead_code)]
+use nnrs_macros::cast_number;
 use std::{iter::Sum, ops::*};
 
 pub trait NumberFuncs {
     fn sqrt(self) -> Self;
     fn cbrt(self) -> Self;
     fn powi(self, n: i32) -> Self;
-    fn powf(self, n: Self) -> Self;
+    fn powf<Num: Number>(self, n: Num) -> Self;
     fn exp(self) -> Self;
     fn exp2(self) -> Self; //2^x
     fn ln(self) -> Self;
@@ -68,86 +69,108 @@ macro_rules! impl_number {
     };
 }
 
-macro_rules! impl_num_funcs {
+// TODO: convert this to a proc_macro
+macro_rules! impl_numfns {
     ($($t:ty),+) => {
         $(
             impl NumberFuncs for $t {
+                #[inline]
                 fn sqrt(self) -> Self {
                     Self(self.0.sqrt())
                 }
 
+                #[inline]
                 fn cbrt(self) -> Self {
                     Self(self.0.cbrt())
                 }
 
+                #[inline]
                 fn powi(self, n: i32) -> Self {
                     Self(self.0.powi(n))
                 }
 
-                fn powf(self, n: Self) -> Self {
-                    Self(self.0.powf(n.0))
+                #[inline]
+                fn powf<Num: Number>(self, n: Num) -> Self {
+                    // Self(self.0.powf(n));
+                    panic!()
                 }
 
+                #[inline]
                 fn exp(self) -> Self {
                     Self(self.0.exp())
                 }
 
+                #[inline]
                 fn exp2(self) -> Self {
                     Self(self.0.exp2())
                 }
 
+                #[inline]
                 fn ln(self) -> Self {
                     Self(self.0.ln())
                 }
 
+                #[inline]
                 fn log(self, base: Self) -> Self {
                     Self(self.0.log(base.0))
                 }
 
+                #[inline]
                 fn log2(self) -> Self {
                     Self(self.0.log2())
                 }
 
+                #[inline]
                 fn log10(self) -> Self {
                     Self(self.0.log10())
                 }
 
+                #[inline]
                 fn abs(self) -> Self {
                     Self(self.0.abs())
                 }
 
+                #[inline]
                 fn signum(self) -> Self {
                     Self(self.0.signum())
                 }
 
+                #[inline]
                 fn floor(self) -> Self {
                     Self(self.0.floor())
                 }
 
+                #[inline]
                 fn ceil(self) -> Self {
                     Self(self.0.ceil())
                 }
 
+                #[inline]
                 fn round(self) -> Self {
                     Self(self.0.round())
                 }
 
+                #[inline]
                 fn trunc(self) -> Self {
                     Self(self.0.trunc())
                 }
 
+                #[inline]
                 fn fract(self) -> Self {
                     Self(self.0.fract())
                 }
 
+                #[inline]
                 fn mul_add(self, a: Self, b: Self) -> Self {
                     Self(self.0.mul_add(a.0, b.0))
                 }
 
+                #[inline]
                 fn max(self, other: Self) -> Self {
                     Self(self.0.max(other.0))
                 }
 
+                #[inline]
                 fn min(self, other: Self) -> Self {
                     Self(self.0.min(other.0))
                 }
@@ -156,7 +179,7 @@ macro_rules! impl_num_funcs {
     };
 }
 
-macro_rules! impl_ops {
+macro_rules! in_operator {
     ($($t:ty),+) => {
         $(
             impl Add for $t {
@@ -200,14 +223,24 @@ macro_rules! impl_ops {
     };
 }
 
-// Proc Macro that enables casting between number types
-casting_number!(F64, F32, I64, I32, I16, I8);
+// #[allow(unused)]
+// macro_rules! caster {
+//     ($($tt:ty),+) => {
+//         $(eval! {
+//             let t = stringify!($tt).to_ascii_lowercase();
+//             output! {
+//                 impl From<{t}> for $tt {
+//                     fn from(value: {t}) -> $tt {
+//                         $tt(value)
+//                     }
+//                 }
+//             }
+//         })*
+//     };
+// }
 
 // impls basic operators for each of the types (eg. +, -, /, *)
-impl_ops![F64, F32, I64, I32, I16, I8];
-
-// impls the number trait
 impl_number![F64, F32, I64, I32, I16, I8];
-
-// impls for number functions
-impl_num_funcs![F64, F32];
+cast_number![F64, F32, I64, I32, I16, I8];
+in_operator![F64, F32, I64, I32, I16, I8];
+impl_numfns![F64, F32];
