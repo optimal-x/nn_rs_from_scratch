@@ -1,18 +1,25 @@
+use linalg::ndarr::arr2::Arr2;
+use linalg::number::*;
+
 pub trait ActivationFunction {
     type OutputZ;
-    fn r#in() -> Self::OutputZ;
-    fn r#out() -> Self::OutputZ;
+    fn a() -> Self::OutputZ;
+    fn prime() -> Self::OutputZ;
 }
 
 struct ReLU;
 impl ActivationFunction for ReLU {
-    type OutputZ = f64;
+    type OutputZ = F64;
 
-    fn r#in() -> Self::OutputZ {
+    fn a() -> Self::OutputZ {
+        // In our case Z is a vector of weight-bias input-outputs
+        //
+        // # in other words
+        // max(Z, 0)
         todo!()
     }
 
-    fn r#out() -> Self::OutputZ {
+    fn prime() -> Self::OutputZ {
         todo!()
     }
 }

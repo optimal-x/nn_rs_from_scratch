@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "cast_from_list",
+    "nnrs_macros",
     "linalg",
     "xor_nn_in_rust",
 ]
