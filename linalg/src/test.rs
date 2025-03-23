@@ -1,7 +1,7 @@
 use super::vec_r2::Vec2;
 use crate::{
-    ndarr::{arr1::Arr1, ArrD},
-    number::{NumberFuncs, F32, I32},
+    ndarr::{ArrD, arr1::Arr1},
+    number::{F32, I32, RealFuncs},
 };
 
 #[test]

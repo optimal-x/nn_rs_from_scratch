@@ -1,10 +1,13 @@
-use crate::{number::Number, shape::Shape};
+use crate::{
+    number::{Comp, RealFuncs},
+    shape::Shape,
+};
 use std::ops::*;
 
 use super::ArrD;
 /// Owner of 1D-array data.
 #[derive(Debug, Clone)]
-pub struct Arr2<T>(Vec<Vec<T>>);
+pub struct Arr2<T>(Vec<Vec<Comp<T>>>);
 
 impl<T> Arr2<T> {
     #[inline]
@@ -19,7 +22,7 @@ impl<T> Arr2<T> {
 
     pub fn matmul(self, rhs: Self) -> Self
     where
-        T: Number,
+        T: RealFuncs,
     {
         let (m, n) = (self.rows(), self.cols());
         let (n_rhs, p) = (rhs.rows(), rhs.cols());
@@ -42,7 +45,7 @@ impl<T> Arr2<T> {
 
     pub fn matadd(self, rhs: Self) -> Self
     where
-        T: Number,
+        T: RealFuncs,
     {
         let shape = self.shape();
         assert_eq!(
@@ -93,20 +96,14 @@ impl<T> ArrD<T, 2> for Arr2<T> {
     }
 }
 
-impl<T> Mul for Arr2<T>
-where
-    T: Number,
-{
+impl<T> Mul for Arr2<T> {
     type Output = Arr2<T>;
     fn mul(self, rhs: Self) -> Self::Output {
         self.matmul(rhs)
     }
 }
 
-impl<T> Add for Arr2<T>
-where
-    T: Number,
-{
+impl<T> Add for Arr2<T> {
     type Output = Arr2<T>;
     fn add(self, rhs: Self) -> Self::Output {
         self.matadd(rhs)

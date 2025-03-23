@@ -37,22 +37,24 @@ pub fn cast_number(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     })
 }
 
-#[proc_macro]
-pub fn impl_numfns(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let types: Vec<&str> = parse_macro_input!(input as Args)
-        .iter()
-        .flat_map(|t| {
-            let str_type = stringify!(t);
-            match str_type {
-                "F32" | "F64" => Some(str_type),
-                _ => None,
-            }
-        })
-        .collect();
+// Procedurally implements NumberFuncs trait for any type so long as its specific
+// design matches the input parameters
+// #[proc_macro]
+// pub fn impl_numfns(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+//     let types: Vec<&str> = parse_macro_input!(input as Args)
+//         .iter()
+//         .flat_map(|t| {
+//             let str_type = stringify!(t);
+//             match str_type {
+//                 "F32" | "F64" => Some(str_type),
+//                 _ => None,
+//             }
+//         })
+//         .collect();
 
-    let generated = quote! {
-        impl NumberFuncs
-    };
+//     let generated = quote! {
+//         impl NumberFuncs
+//     };
 
-    todo!()
-}
+//     todo!()
+// }

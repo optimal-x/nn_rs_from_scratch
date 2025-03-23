@@ -1,181 +1,100 @@
 #![allow(dead_code)]
-use nnrs_macros::cast_number;
-use std::{iter::Sum, ops::*};
+// use nnrs_macros::cast_number;
+use std::ops::*;
 
-pub trait NumberFuncs {
-    fn sqrt(self) -> Self;
-    fn cbrt(self) -> Self;
-    fn powi(self, n: i32) -> Self;
-    fn powf<Num: Number>(self, n: Num) -> Self;
-    fn exp(self) -> Self;
-    fn exp2(self) -> Self; //2^x
-    fn ln(self) -> Self;
-    fn log(self, base: Self) -> Self;
-    fn log2(self) -> Self;
-    fn log10(self) -> Self;
-    fn abs(self) -> Self;
-    fn signum(self) -> Self;
-    fn floor(self) -> Self;
-    fn ceil(self) -> Self;
-    fn round(self) -> Self;
-    fn trunc(self) -> Self;
-    fn fract(self) -> Self;
-    fn mul_add(self, a: Self, b: Self) -> Self;
-    fn max(self, other: Self) -> Self;
-    fn min(self, other: Self) -> Self;
+pub trait GetSetDelegate {
+    fn get(&self) -> Box<dyn GetSetDelegate>;
+    fn set(&self, value: Box<dyn GetSetDelegate>);
 }
 
-pub trait Number:
-    Sized
-    + Copy
-    + Default
-    + PartialEq
-    + PartialOrd
-    + Add<Output = Self>
-    + Sub<Output = Self>
-    + Mul<Output = Self>
-    + Div<Output = Self>
-    + Neg<Output = Self>
-    + Sum<Self>
-{
-    fn cast_to<U>(self) -> U
-    where
-        U: Number,
-        U: std::convert::From<Self>,
-    {
-        self.into()
+pub trait NaturalFuncs<T> {
+    fn abs(self) -> Comp<T>;
+    fn signum(self) -> Comp<T>;
+}
+
+pub trait RealFuncs<T>: NaturalFuncs<T> {
+    fn sqrt(self) -> Comp<T>;
+    fn cbrt(self) -> Comp<T>;
+    fn powi(self, n: i32) -> Comp<T>;
+    fn powf(self, n: Comp<T>) -> Comp<T>;
+    fn exp(self) -> Comp<T>;
+    fn exp2(self) -> Comp<T>; //2^x
+    fn ln(self) -> Comp<T>;
+    fn log(self, base: Comp<T>) -> Comp<T>;
+    fn log2(self) -> Comp<T>;
+    fn log10(self) -> Comp<T>;
+    fn floor(self) -> Comp<T>;
+    fn ceil(self) -> Comp<T>;
+    fn round(self) -> Comp<T>;
+    fn trunc(self) -> Comp<T>;
+    fn fract(self) -> Comp<T>;
+    fn mul_add(self, a: Comp<T>, b: Comp<T>) -> Comp<T>;
+    fn max(self, other: Comp<T>) -> Comp<T>;
+    fn min(self, other: Comp<T>) -> Comp<T>;
+}
+
+pub struct Comp<T>(T);
+impl<T> Comp<T> {
+    #[inline(always)]
+    pub fn get(&self) -> &T {
+        &self.0
+    }
+
+    #[inline(always)]
+    pub fn set(&mut self, value: T) {
+        self.0 = value;
     }
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
-pub struct I8(pub i8);
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
-pub struct I16(pub i16);
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
-pub struct I32(pub i32);
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
-pub struct I64(pub i64);
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
-pub struct I128(pub i128);
+impl<T> Deref for Comp<T> {
+    type Target = T;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
-pub struct F32(pub f32);
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
-pub struct F64(pub f64);
-
-macro_rules! impl_number {
-    ($($t:ty),+) => {
-        $(impl Number for $t {})*
-    };
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
-// TODO: convert this to a proc_macro
-macro_rules! impl_numfns {
-    ($($t:ty),+) => {
-        $(
-            impl NumberFuncs for $t {
-                #[inline]
-                fn sqrt(self) -> Self {
-                    Self(self.0.sqrt())
-                }
-
-                #[inline]
-                fn cbrt(self) -> Self {
-                    Self(self.0.cbrt())
-                }
-
-                #[inline]
-                fn powi(self, n: i32) -> Self {
-                    Self(self.0.powi(n))
-                }
-
-                #[inline]
-                fn powf<Num: Number>(self, n: Num) -> Self {
-                    // Self(self.0.powf(n));
-                    panic!()
-                }
-
-                #[inline]
-                fn exp(self) -> Self {
-                    Self(self.0.exp())
-                }
-
-                #[inline]
-                fn exp2(self) -> Self {
-                    Self(self.0.exp2())
-                }
-
-                #[inline]
-                fn ln(self) -> Self {
-                    Self(self.0.ln())
-                }
-
-                #[inline]
-                fn log(self, base: Self) -> Self {
-                    Self(self.0.log(base.0))
-                }
-
-                #[inline]
-                fn log2(self) -> Self {
-                    Self(self.0.log2())
-                }
-
-                #[inline]
-                fn log10(self) -> Self {
-                    Self(self.0.log10())
-                }
-
-                #[inline]
-                fn abs(self) -> Self {
-                    Self(self.0.abs())
-                }
-
-                #[inline]
-                fn signum(self) -> Self {
-                    Self(self.0.signum())
-                }
-
-                #[inline]
-                fn floor(self) -> Self {
-                    Self(self.0.floor())
-                }
-
-                #[inline]
-                fn ceil(self) -> Self {
-                    Self(self.0.ceil())
-                }
-
-                #[inline]
-                fn round(self) -> Self {
-                    Self(self.0.round())
-                }
-
-                #[inline]
-                fn trunc(self) -> Self {
-                    Self(self.0.trunc())
-                }
-
-                #[inline]
-                fn fract(self) -> Self {
-                    Self(self.0.fract())
-                }
-
-                #[inline]
-                fn mul_add(self, a: Self, b: Self) -> Self {
-                    Self(self.0.mul_add(a.0, b.0))
-                }
-
-                #[inline]
-                fn max(self, other: Self) -> Self {
-                    Self(self.0.max(other.0))
-                }
-
-                #[inline]
-                fn min(self, other: Self) -> Self {
-                    Self(self.0.min(other.0))
-                }
+macro_rules! impl_integerfuncs_for_comp_t {
+    ($ty:ty) => {
+        impl NaturalFuncs<$ty> for Comp<$ty> {
+            fn abs(self) -> Comp<$ty> {
+                Self(self.get().abs())
             }
-        )*
+
+            fn signum(self) -> Comp<$ty> {
+                Self(self.get().signum())
+            }
+        }
+    };
+    ($($ty:ty),+) => {
+        $(impl_integerfuncs_for_comp_t!($ty);)*
+    };
+}
+macro_rules! impl_numberfuncs_for_comp_t {
+    ($ty:ty) => {
+        impl RealFuncs<$ty> for Comp<$ty> {
+            fn sqrt(self) -> Comp<$ty> { Self(self.get().sqrt()) }
+            fn cbrt(self) -> Comp<$ty> { Self(self.get().cbrt()) }
+            fn powi(self, n: i32) -> Comp<$ty> { Self(self.get().powi(n)) }
+            fn powf(self, n: Comp<$ty>) -> Comp<$ty> { Self(self.get().powf(*n.get())) }
+            fn exp(self) -> Comp<$ty> { Self(self.get().exp()) }
+            fn exp2(self) -> Comp<$ty> { Self(self.get().exp2()) }
+            fn ln(self) -> Comp<$ty> { Self(self.get().ln()) }
+            fn log(self, base: Comp<$ty>) -> Comp<$ty> { Self(self.get().log(*base.get())) }
+            fn log2(self) -> Comp<$ty> { Self(self.get().log2()) }
+            fn log10(self) -> Comp<$ty> { Self(self.get().log10()) }
+            fn floor(self) -> Comp<$ty> { Self(self.get().floor()) }
+            fn ceil(self) -> Comp<$ty> { Self(self.get().ceil()) }
+            fn round(self) -> Comp<$ty> { Self(self.get().round()) }
+            fn trunc(self) -> Comp<$ty> { Self(self.get().trunc()) }
+            fn fract(self) -> Comp<$ty> { Self(self.get().fract()) }
+            fn mul_add(self, a: Comp<$ty>, b: Comp<$ty>) -> Comp<$ty> { Self(self.get().mul_add(*a.get(), *b.get())) }
+            fn max(self, other: Comp<$ty>) -> Comp<$ty> { Self(self.get().max(*other.get())) }
+            fn min(self, other: Comp<$ty>) -> Comp<$ty> { Self(self.get().min(*other.get())) }
+        }
+    };
+    ($($ty:ty),+) => {
+        $(impl_numberfuncs_for_comp_t!($ty);)*
     };
 }
 
@@ -223,24 +142,9 @@ macro_rules! in_operator {
     };
 }
 
-// #[allow(unused)]
-// macro_rules! caster {
-//     ($($tt:ty),+) => {
-//         $(eval! {
-//             let t = stringify!($tt).to_ascii_lowercase();
-//             output! {
-//                 impl From<{t}> for $tt {
-//                     fn from(value: {t}) -> $tt {
-//                         $tt(value)
-//                     }
-//                 }
-//             }
-//         })*
-//     };
-// }
-
 // impls basic operators for each of the types (eg. +, -, /, *)
-impl_number![F64, F32, I64, I32, I16, I8];
-cast_number![F64, F32, I64, I32, I16, I8];
-in_operator![F64, F32, I64, I32, I16, I8];
-impl_numfns![F64, F32];
+// impl_number![F64, F32, I64, I32, I16, I8];
+// cast_number![F64, F32, I64, I32, I16, I8];
+// in_operator![F64, F32, I64, I32, I16, I8];
+impl_integerfuncs_for_comp_t![f32, f64, i32, i64, i128];
+impl_numberfuncs_for_comp_t![f32, f64];
