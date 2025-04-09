@@ -1,17 +1,29 @@
-use crate::number::Number;
+use crate::shape::{Shape, StructureShape};
 
+///====================== Vec3 ======================
 #[derive(Debug, Clone, Copy)]
-pub struct Vec3<T: Number>([T; 3]);
-impl<T: Number> Vec3<T> {
+pub struct Vec3<T>([T; 3]);
+impl<T> Vec3<T> {
     pub fn new(x: T, y: T, z: T) -> Self {
         Self([x, y, z])
     }
 }
 
+///====================== Vec3 Shape ======================
+impl<T> Shape<1> for Vec3<T> {
+    fn structure(&self) -> StructureShape<1> {
+        StructureShape::<1>::from([3])
+    }
+
+    fn n_volume(&self) -> usize {
+        3
+    }
+} 
+
 ///====================== Vec3 Neg ======================
 impl<T> std::ops::Neg for Vec3<T>
 where
-    T: Number + Clone + Copy,
+    T: Clone + Copy,
     T: std::ops::Neg<Output = T>,
 {
     type Output = Self;
@@ -24,7 +36,6 @@ where
 ///====================== Vec3 Add ======================
 impl<T> std::ops::Add for Vec3<T>
 where
-    T: Number,
     T: std::ops::Add<Output = T>,
     T: Clone + Copy,
 {
@@ -41,7 +52,6 @@ where
 ///====================== Vec3 Mul ======================
 impl<T> std::ops::Mul for Vec3<T>
 where
-    T: Number,
     T: std::ops::Mul<Output = T>,
     T: std::ops::Add<Output = T>,
     T: Clone + Copy,
@@ -60,7 +70,6 @@ where
 ///====================== Vec3 Sub ======================
 impl<T> std::ops::Sub for Vec3<T>
 where
-    T: Number,
     T: std::ops::Add<Output = T>,
     T: std::ops::Neg<Output = T>,
     T: Clone + Copy,

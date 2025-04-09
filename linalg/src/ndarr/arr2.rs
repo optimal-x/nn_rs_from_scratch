@@ -84,7 +84,7 @@ impl<T> From<Vec<Vec<T>>> for Arr2<T> {
 
 impl<T> ArrD<T, 2> for Arr2<T> {
     fn get(&self, indicies: &[usize]) -> Option<&T> {
-        assert_eq!(self.axis(), indicies.len());
+        assert_eq!(self.rank(), indicies.len());
         match indicies[0] > self.len() && indicies[2] > self[0].len() {
             true => None,
             false => Some(&self[indicies[0]][indicies[1]]),

@@ -1,10 +1,19 @@
 use std::ops::Deref;
 
-///.
-#[derive(Debug, PartialEq)]
-pub struct Shape<const DIMS: usize>(pub [usize; DIMS]);
+pub trait Shape<const DIM: usize> {
+    const RANK: usize = DIM;
+    /// the actual structure of the shape required.
+    fn structure(&self) -> StructureShape<DIM>;
+    
+    /// the total n-volume of a given shape, sometimes refered to as hypervolume.
+    /// For example, in 5 dimensional shape we'd say it a has a 5-volume.
+    fn n_volume(&self) -> usize;
+}
 
-impl<const DIMS: usize> Deref for Shape<DIMS> {
+#[derive(Debug, PartialEq)]
+pub struct StructureShape<const DIM: usize>(pub [usize; DIM]);
+
+impl<const DIM: usize> Deref for StructureShape<DIM> {
     type Target = [usize];
 
     fn deref(&self) -> &Self::Target {
@@ -12,8 +21,8 @@ impl<const DIMS: usize> Deref for Shape<DIMS> {
     }
 }
 
-impl<const DIMS: usize> From<[usize; DIMS]> for Shape<DIMS> {
-    fn from(value: [usize; DIMS]) -> Self {
+impl<const DIM: usize> From<[usize; DIM]> for StructureShape<DIM> {
+    fn from(value: [usize; DIM]) -> Self {
         Self(value)
     }
 }

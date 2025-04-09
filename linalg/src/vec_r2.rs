@@ -1,18 +1,43 @@
-use crate::number::Number;
+use crate::{ndarr::tensor::Container, shape::{Shape, StructureShape}};
 
 ///====================== Vec2 ======================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Vec2<T: Number>([T; 2]);
-impl<T: Number> Vec2<T> {
+pub struct Vec2<T>([T; 2]);
+impl<T> Vec2<T> {
     pub fn new(x: T, y: T) -> Self {
         Self([x, y])
+    }
+}
+
+///====================== Vec2 Shape ======================
+impl<T> Shape<1> for Vec2<T> {
+    fn structure(&self) -> StructureShape<1> {
+        StructureShape::<1>::from([2])
+    }
+
+    fn n_volume(&self) -> usize {
+        2
+    }
+
+}
+
+///====================== Vec2 Container ======================
+impl<T> Container<T, 1> for Vec2<T> {
+    fn at(&self, indicies: &[usize]) -> Option<&T> {
+        assert_eq!(indicies.len(), Self::RANK);
+        todo!() // TODO
+    }
+
+    fn set_at(&self, indicies: &[usize], value: T) {
+        assert_eq!(indicies.len(), Self::RANK);
+        todo!() // TODO
     }
 }
 
 ///====================== Vec2 Neg ======================
 impl<T> std::ops::Neg for Vec2<T>
 where
-    T: Number + Clone + Copy,
+    T: Clone + Copy,
     T: std::ops::Neg<Output = T>,
 {
     type Output = Self;
@@ -25,7 +50,6 @@ where
 ///====================== Vec2 Add ======================
 impl<T> std::ops::Add for Vec2<T>
 where
-    T: Number,
     T: std::ops::Add<Output = T>,
     T: Clone + Copy,
 {
@@ -41,7 +65,6 @@ where
 ///====================== Vec2 Mul ======================
 impl<T> std::ops::Mul for Vec2<T>
 where
-    T: Number,
     T: std::ops::Mul<Output = T>,
     T: std::ops::Add<Output = T>,
     T: Clone + Copy,
@@ -59,7 +82,6 @@ where
 ///====================== Vec2 Sub ======================
 impl<T> std::ops::Sub for Vec2<T>
 where
-    T: Number,
     T: std::ops::Add<Output = T>,
     T: std::ops::Neg<Output = T>,
     T: Clone + Copy,

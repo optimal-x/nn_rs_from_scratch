@@ -76,7 +76,7 @@ impl<T> Arr1<T> {
 
 impl<T> ArrD<T, 1> for Arr1<T> {
     fn get(&self, indicies: &[usize]) -> Option<&T> {
-        assert_eq!(self.axis(), indicies.len());
+        assert_eq!(self.rank(), indicies.len());
         match indicies[0] > self.len() {
             true => None,
             false => Some(&self[indicies[0]]),
