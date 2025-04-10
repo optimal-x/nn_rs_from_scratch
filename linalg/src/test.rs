@@ -1,8 +1,7 @@
 use super::vec_r2::Vec2;
-use crate::{
-    ndarr::{ArrD, arr1::Arr1},
-    number::{RealFuncs},
-};
+use crate::
+    ndarr::{arr1::Arr1}
+;
 
 #[test]
 pub(self) fn test_add() {

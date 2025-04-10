@@ -1,28 +1,31 @@
 use crate::{
-    number::{Comp, RealFuncs},
-    shape::Shape,
+    number::RealFuncs,
+    shape::{Shape, StructureShape},
 };
-use std::ops::*;
+use std::{iter::Sum, ops::*};
 
-use super::ArrD;
-/// Owner of 1D-array data.
+///====================== Arr2 ======================
 #[derive(Debug, Clone)]
-pub struct Arr2<T>(Vec<Vec<Comp<T>>>);
+pub struct Arr2<T>(Vec<Vec<T>>);
 
 impl<T> Arr2<T> {
     #[inline]
     pub fn rows(&self) -> usize {
-        self.len()
+        self.shape()[0]
     }
 
     #[inline]
     pub fn cols(&self) -> usize {
-        self.first().map_or(0, |row| row.len())
+        self.shape()[1]
     }
 
     pub fn matmul(self, rhs: Self) -> Self
     where
-        T: RealFuncs,
+        T: Clone + Copy,
+        T: RealFuncs<T>,
+        T: Mul<Output = T>,
+        T: Default,
+        T: Sum<T>,
     {
         let (m, n) = (self.rows(), self.cols());
         let (n_rhs, p) = (rhs.rows(), rhs.cols());
@@ -45,7 +48,9 @@ impl<T> Arr2<T> {
 
     pub fn matadd(self, rhs: Self) -> Self
     where
-        T: RealFuncs,
+        T: Clone + Copy,
+        T: RealFuncs<T>,
+        T: Add<Output = T>,
     {
         let shape = self.shape();
         assert_eq!(
@@ -65,7 +70,18 @@ impl<T> Arr2<T> {
         Arr2::from(collector)
     }
 }
+///====================== Arr2 Shape ======================
+impl<T> Shape<2> for Arr2<T> {
+    fn shape(&self) -> StructureShape<2> {
+        StructureShape::<2>::from([self.len(), self[0].len()])
+    }
 
+    fn n_volume(&self) -> usize {
+        self.shape()[0] * self.shape()[1]
+    }
+}
+
+///====================== Arr2 Deref ======================
 impl<T> Deref for Arr2<T> {
     type Target = Vec<Vec<T>>;
 
@@ -75,6 +91,7 @@ impl<T> Deref for Arr2<T> {
     }
 }
 
+///====================== Arr2 Deref ======================
 impl<T> From<Vec<Vec<T>>> for Arr2<T> {
     #[inline]
     fn from(value: Vec<Vec<T>>) -> Self {
@@ -82,28 +99,28 @@ impl<T> From<Vec<Vec<T>>> for Arr2<T> {
     }
 }
 
-impl<T> ArrD<T, 2> for Arr2<T> {
-    fn get(&self, indicies: &[usize]) -> Option<&T> {
-        assert_eq!(self.rank(), indicies.len());
-        match indicies[0] > self.len() && indicies[2] > self[0].len() {
-            true => None,
-            false => Some(&self[indicies[0]][indicies[1]]),
-        }
-    }
-
-    fn shape(&self) -> Shape<2> {
-        Shape::from([self.len(), self[0].len()])
-    }
-}
-
-impl<T> Mul for Arr2<T> {
+///====================== Arr2 Mul ======================
+impl<T> Mul for Arr2<T>
+where
+    T: Mul<Output = T>,
+    T: Sum<T>,
+    T: Default,
+    T: RealFuncs<T>,
+    T: Clone + Copy,
+{
     type Output = Arr2<T>;
     fn mul(self, rhs: Self) -> Self::Output {
         self.matmul(rhs)
     }
 }
 
-impl<T> Add for Arr2<T> {
+///====================== Arr2 Add ======================
+impl<T> Add for Arr2<T>
+where
+    T: Add<Output = T>,
+    T: RealFuncs<T>,
+    T: Clone + Copy
+{
     type Output = Arr2<T>;
     fn add(self, rhs: Self) -> Self::Output {
         self.matadd(rhs)

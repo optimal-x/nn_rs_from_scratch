@@ -11,7 +11,7 @@ impl<T> Vec3<T> {
 
 ///====================== Vec3 Shape ======================
 impl<T> Shape<1> for Vec3<T> {
-    fn structure(&self) -> StructureShape<1> {
+    fn shape(&self) -> StructureShape<1> {
         StructureShape::<1>::from([3])
     }
 

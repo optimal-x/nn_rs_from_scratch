@@ -11,10 +11,12 @@ impl<T> Vec2<T> {
 
 ///====================== Vec2 Shape ======================
 impl<T> Shape<1> for Vec2<T> {
-    fn structure(&self) -> StructureShape<1> {
+    #[inline(always)]
+    fn shape(&self) -> StructureShape<1> {
         StructureShape::<1>::from([2])
     }
 
+    #[inline(always)]
     fn n_volume(&self) -> usize {
         2
     }

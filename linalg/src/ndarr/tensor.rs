@@ -11,6 +11,7 @@ where
     Ct: Container<T, DIM>,
 {
     dtype: PhantomData<T>,
+    shape: StructureShape<DIM>,
     data: Ct,
 }
 
@@ -19,14 +20,15 @@ where
     Ct: Container<T, DIM>,
 {
     pub const RANK: usize = DIM;
-    
+
     pub fn new(data: Ct) -> Self {
         Self {
             dtype: PhantomData::<T>,
+            shape: data.shape(),
             data,
         }
     }
- 
+
     pub fn shape(&self) -> &StructureShape<DIM> {
         &self.shape
     }

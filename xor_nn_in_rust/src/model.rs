@@ -1,5 +1,3 @@
-use linalg::ndarr::arr2::Arr2;
-use linalg::number::*;
 
 pub trait ActivationFunction {
     type OutputZ;
@@ -9,7 +7,6 @@ pub trait ActivationFunction {
 
 struct ReLU;
 impl ActivationFunction for ReLU {
-    type OutputZ = F64;
 
     fn a() -> Self::OutputZ {
         // In our case Z is a vector of weight-bias input-outputs
@@ -22,4 +19,6 @@ impl ActivationFunction for ReLU {
     fn prime() -> Self::OutputZ {
         todo!()
     }
+
+    type OutputZ = ();
 }
