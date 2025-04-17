@@ -10,8 +10,20 @@ pub trait Shape<const DIM: usize> {
     fn n_volume(&self) -> usize;
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct StructureShape<const DIM: usize>(pub [usize; DIM]);
+
+/// the structure of a shape is infact a shape.
+impl<const DIM: usize> Shape<DIM> for StructureShape<DIM> {
+    fn shape(&self) -> StructureShape<DIM> {
+        self.clone()
+    }
+
+    fn n_volume(&self) -> usize {
+        self.iter().fold(1, |acc, x| acc * x) // mul all the elements by each other.
+    }
+}
+
 
 impl<const DIM: usize> Deref for StructureShape<DIM> {
     type Target = [usize];
