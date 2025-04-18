@@ -19,7 +19,7 @@ use crate::shape::Shape;
 /// tensor.reshape(StructureShape::<3>::from([1,2,3]));
 /// ```
 
-pub fn flatten_indices<const DIM: usize>(
+pub fn compute_strides<const DIM: usize>(
     shape: &impl Shape<DIM>,
 ) -> Vec<usize> {
     let structure_shape = shape.shape();
@@ -34,3 +34,18 @@ pub fn flatten_indices<const DIM: usize>(
 
     return strides;
 }
+
+/// pub-sub struct for watching transormation behaviour
+pub struct Transform {
+    shape: Vec<usize>,
+    strides: Vec<usize>,
+}
+
+pub trait IndexTransform {
+    fn to_flat(&self, logical: &[usize]) -> usize;
+    fn reshape(&self) -> Result<(), String>;
+    fn strides(&self) -> &[usize];
+    // Optional:
+    fn reverse(&self, flat_index: usize) -> Vec<usize>;
+}
+
