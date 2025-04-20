@@ -1,51 +1,42 @@
-use crate::shape::{Shape, StructureShape};
+use super::{container::Container, transform::Transform};
 use std::marker::PhantomData;
 
-use super::transform::{compute_strides, Transform};
-
-pub trait Container<T, const DIM: usize>: Shape<DIM> {
-    fn at(&self, indicies: &[usize]) -> Option<&T>;
-    fn set_at(&self, indicies: &[usize], value: T);
-}
-
-pub struct Tensor<T, Ct, const DIM: usize>
+pub struct Tensor<'a, T, Ct, const DIM: usize>
 where
     Ct: Container<T, DIM>,
 {
     dtype: PhantomData<T>,
-    // offset: usize, // maybe needed. Assume offset is 0 for now
-    shape: StructureShape<DIM>,
-    subscribers: Vec<Transform>,
-    strides: Vec<usize>,
+    pub transform: Option<&'a dyn Transform>,
     data: Ct,
 }
 
-impl<T, Ct, const DIM: usize> Tensor<T, Ct, DIM>
+impl<'a, T, Ct, const DIM: usize> Tensor<'a, T, Ct, DIM>
 where
     Ct: Container<T, DIM>,
 {
     pub const RANK: usize = DIM;
 
     pub fn new(data: Ct) -> Self {
-        let strides = compute_strides(&data.shape());
         Self {
             dtype: PhantomData::<T>,
-            shape: data.shape(),
-            subscribers: vec![],
-            strides,
+            transform: None,
             data,
         }
-    }
-
-    pub fn shape(&self) -> &StructureShape<DIM> {
-        &self.shape
     }
 
     pub fn data(&self) -> &Ct {
         &self.data
     }
 
-    pub fn strides(&self) -> &[usize] {
-        &self.strides
+    pub fn transform(&self) -> Option<&dyn Transform> {
+        if let Some(transform) = self.transform.as_deref() {
+            Some(transform)
+        } else {
+            None
+        }
+    }
+
+    pub fn set_transform(&mut self, transform: &'a dyn Transform) {
+        self.transform = Some(transform);
     }
 }

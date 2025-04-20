@@ -1,4 +1,4 @@
-use crate::{ndarr::tensor::Container, shape::{Shape, StructureShape}};
+use crate::{ndarr::container::Container, shape::{Shape, StructureShape}};
 
 ///====================== Vec2 ======================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

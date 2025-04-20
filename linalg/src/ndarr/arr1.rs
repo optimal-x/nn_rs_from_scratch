@@ -1,4 +1,4 @@
-use super::tensor::Container;
+use super::container::Container;
 use crate::{
     number::RealFuncs,
     shape::{Shape, StructureShape},

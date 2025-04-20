@@ -31,21 +31,42 @@ pub fn compute_strides<const DIM: usize>(
         strides[i] = stride;
         stride *= structure_shape[i];
     }
-
-    return strides;
+    strides
 }
 
-/// pub-sub struct for watching transormation behaviour
-pub struct Transform {
-    shape: Vec<usize>,
-    strides: Vec<usize>,
+pub mod concrete_transformers {
+    use super::Transform;
+
+    pub struct ChainedTransforms<'a> {
+        pub stages: Vec<&'a dyn Transform>,
+    }
+
+    /// pub-sub struct for watching transormation behaviour
+    pub struct ReshapeTransform {
+        pub in_shape: Vec<usize>,
+        pub out_shape: Vec<usize>,
+        pub strides: Vec<usize>,
+    }
 }
 
-pub trait IndexTransform {
+pub enum TransformError {
+    ReshapeError,
+    Error,
+}
+
+pub trait Transform {
+    /// Maps a logical multi-dimensional index (e.g., [i, j, k]) to a flat index into the data buffer.
     fn to_flat(&self, logical: &[usize]) -> usize;
-    fn reshape(&self) -> Result<(), String>;
-    fn strides(&self) -> &[usize];
-    // Optional:
-    fn reverse(&self, flat_index: usize) -> Vec<usize>;
-}
 
+    /// Maps a flat index back to a logical index (e.g., [i, j, k]) if reversible.
+    fn reverse(&self, flat_index: usize) -> Vec<usize>;
+
+    /// Returns the logical shape after the transform.
+    fn shape(&self) -> &[usize];
+
+    /// Returns the logical strides used for index computation.
+    fn strides(&self) -> &[usize];
+
+    /// Optionally validates or adjusts the shape.
+    fn reshape(&mut self) -> Result<(), TransformError>;
+}
