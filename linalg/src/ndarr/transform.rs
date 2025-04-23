@@ -34,23 +34,36 @@ pub fn compute_strides<const DIM: usize>(
     strides
 }
 
+pub fn matching_hypervolume<const DIM_1: usize, const DIM_2: usize>(
+    first: &impl Shape<DIM_1>,
+    second: &impl Shape<DIM_2>,
+) -> Result<(), TransformError> {
+    if first.n_volume() == second.n_volume() {
+        Ok(())
+    } else {
+        Err(TransformError::MisMatchHypervolume)
+    }
+}
+
 pub mod concrete_transformers {
     use super::Transform;
+
+    pub struct IdentityTransform;
 
     pub struct ChainedTransforms<'a> {
         pub stages: Vec<&'a dyn Transform>,
     }
 
-    /// pub-sub struct for watching transormation behaviour
     pub struct ReshapeTransform {
         pub in_shape: Vec<usize>,
         pub out_shape: Vec<usize>,
-        pub strides: Vec<usize>,
+        pub strides: Vec<usize>, // only one set of strides since both volumes will always be the same
     }
 }
 
 pub enum TransformError {
     ReshapeError,
+    MisMatchHypervolume,
     Error,
 }
 
@@ -66,7 +79,4 @@ pub trait Transform {
 
     /// Returns the logical strides used for index computation.
     fn strides(&self) -> &[usize];
-
-    /// Optionally validates or adjusts the shape.
-    fn reshape(&mut self) -> Result<(), TransformError>;
 }

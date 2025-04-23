@@ -6,7 +6,7 @@ where
     Ct: Container<T, DIM>,
 {
     dtype: PhantomData<T>,
-    pub transform: Option<&'a dyn Transform>,
+    transform: Option<&'a dyn Transform>,
     data: Ct,
 }
 
