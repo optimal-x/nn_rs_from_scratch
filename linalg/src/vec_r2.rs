@@ -32,12 +32,12 @@ impl<T> Shape for Vec2<T> {
 impl<T> Container<T> for Vec2<T> {
     fn at(&self, indicies: &[usize]) -> Option<&T> {
         assert_eq!(indicies.len(), self.rank());
-        todo!() // TODO
+        Some(&self.0[indicies[0]])
     }
 
-    fn set_at(&self, indicies: &[usize], value: T) {
+    fn set_at(&mut self, indicies: &[usize], value: T) {
         assert_eq!(indicies.len(), self.rank());
-        todo!() // TODO
+        self.0[indicies[0]] = value;
     }
 }
 

@@ -1,6 +1,6 @@
 use super::vec_r2::Vec2;
 use crate::ndarr::arr1::Arr1;
-use crate::ndarr::container;
+use crate::ndarr::container::Container;
 
 #[test]
 pub(self) fn test_add() {
@@ -13,7 +13,7 @@ pub(self) fn test_add() {
 pub(self) fn test_sub() {
     let v1 = Vec2::new(1, 2);
     let v2 = Vec2::new(3, 4);
-    assert_eq!(v1 - v2, Vec2::new((-2), (-2)));
+    assert_eq!(v1 - v2, Vec2::new(-2, -2));
 }
 
 #[test]
@@ -33,10 +33,10 @@ pub(self) fn test_arr1_deref() {
 
 #[test]
 pub(self) fn test_arr1_get() {
-    let arr1 = Arr1::from(vec![(0.0); 10]);
-    assert_eq!(Some(&0.0), arr1.get(&[0]));
-    assert_eq!(Some(&0.0), arr1.get(&[2]));
-    assert_eq!(Some(&0.0), arr1.get(&[0]));
+    let arr1 = Arr1::from(vec![0.0; 10]);
+    assert_eq!(Some(&0.0), arr1.at(&[0usize]));
+    assert_eq!(Some(&0.0), arr1.at(&[2usize]));
+    assert_eq!(Some(&0.0), arr1.at(&[0usize]));
 }
 
 #[test]
@@ -45,15 +45,15 @@ pub(self) fn test_arr1_distance() {
     let arr_0 = Arr1::from(vec![-1.0, 0.0]);
     let arr_1 = Arr1::from(vec![0.0, -0.0]);
     let dist = arr_0.distance(&arr_1);
-    assert_eq!((1.0_f32), dist);
+    assert_eq!((1.0_f64), dist);
 
     let arr_0 = Arr1::from(vec![3.0, 4.0]);
     let arr_1 = Arr1::from(vec![3.0, 0.0]);
     let dist = arr_0.distance(&arr_1);
-    assert_eq!((4.0_f32), dist);
+    assert_eq!((4.0_f64), dist);
 
     let arr_0 = Arr1::from(vec![3.0, 4.0]);
     let arr_1 = Arr1::from(vec![4.0, 3.0]);
     let dist = arr_0.distance(&arr_1);
-    assert_eq!((2.0_f32).sqrt(), dist);
+    assert_eq!((2.0_f64).sqrt(), dist);
 }
