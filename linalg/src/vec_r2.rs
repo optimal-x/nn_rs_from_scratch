@@ -10,10 +10,10 @@ impl<T> Vec2<T> {
 }
 
 ///====================== Vec2 Shape ======================
-impl<T> Shape<1> for Vec2<T> {
+impl<T> Shape for Vec2<T> {
     #[inline(always)]
-    fn shape(&self) -> StructureShape<1> {
-        StructureShape::<1>::from([2])
+    fn shape(&self) -> StructureShape {
+        StructureShape::from(vec![2].into_boxed_slice())
     }
 
     #[inline(always)]
@@ -21,17 +21,22 @@ impl<T> Shape<1> for Vec2<T> {
         2
     }
 
+    #[inline(always)]
+    fn rank(&self) -> usize {
+        1
+    }
+
 }
 
 ///====================== Vec2 Container ======================
-impl<T> Container<T, 1> for Vec2<T> {
+impl<T> Container<T> for Vec2<T> {
     fn at(&self, indicies: &[usize]) -> Option<&T> {
-        assert_eq!(indicies.len(), Self::RANK);
+        assert_eq!(indicies.len(), self.rank());
         todo!() // TODO
     }
 
     fn set_at(&self, indicies: &[usize], value: T) {
-        assert_eq!(indicies.len(), Self::RANK);
+        assert_eq!(indicies.len(), self.rank());
         todo!() // TODO
     }
 }

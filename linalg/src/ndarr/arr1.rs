@@ -65,27 +65,31 @@ impl<T> Arr1<T> {
 }
 
 ///====================== Arr1 Shape ======================
-impl<T> Shape<1> for Arr1<T> {
+impl<T> Shape for Arr1<T> {
     #[inline(always)]
-    fn shape(&self) -> StructureShape<1> {
-        StructureShape::<1>::from([self.0.len()])
+    fn shape(&self) -> StructureShape {
+        StructureShape::from(vec![self.0.len()].into_boxed_slice())
     }
 
     #[inline(always)]
     fn n_volume(&self) -> usize {
         self.0.len()
     }
+
+    fn rank(&self) -> usize {
+        1
+    }
 }
 
 ///====================== Arr1 Container ======================
-impl<T> Container<T, 1> for Arr1<T> {
+impl<T> Container<T> for Arr1<T> {
     fn at(&self, indicies: &[usize]) -> Option<&T> {
-        assert_eq!(indicies.len(), Self::RANK);
+        assert_eq!(indicies.len(), self.rank());
         todo!() // TODO
     }
 
     fn set_at(&self, indicies: &[usize], value: T) {
-        assert_eq!(indicies.len(), Self::RANK);
+        assert_eq!(indicies.len(), self.rank());
         todo!() // TODO
     }
 }

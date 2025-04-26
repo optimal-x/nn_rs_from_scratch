@@ -1,21 +1,19 @@
 use super::{container::Container, transform::Transform};
 use std::marker::PhantomData;
 
-pub struct Tensor<'a, T, Ct, const DIM: usize>
+pub struct Tensor<'a, T, Ct>
 where
-    Ct: Container<T, DIM>,
+    Ct: Container<T>,
 {
     dtype: PhantomData<T>,
     transform: Option<&'a dyn Transform>,
     data: Ct,
 }
 
-impl<'a, T, Ct, const DIM: usize> Tensor<'a, T, Ct, DIM>
+impl<'a, T, Ct> Tensor<'a, T, Ct>
 where
-    Ct: Container<T, DIM>,
+    Ct: Container<T>,
 {
-    pub const RANK: usize = DIM;
-
     pub fn new(data: Ct) -> Self {
         Self {
             dtype: PhantomData::<T>,

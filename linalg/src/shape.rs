@@ -1,9 +1,10 @@
 use std::ops::Deref;
 
-pub trait Shape<const DIM: usize> {
-    const RANK: usize = DIM;
+pub trait Shape {
+    fn rank(&self) -> usize;
+    
     /// the actual structure of the shape required.
-    fn shape(&self) -> StructureShape<DIM>;
+    fn shape(&self) -> StructureShape;
     
     /// the total n-volume of a given shape, sometimes refered to as hypervolume.
     /// For example, in 5 dimensional shape we'd say it a has a 5-volume.
@@ -11,21 +12,24 @@ pub trait Shape<const DIM: usize> {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct StructureShape<const DIM: usize>(pub [usize; DIM]);
+pub struct StructureShape(pub Box<[usize]>);
 
 /// the structure of a shape is infact a shape.
-impl<const DIM: usize> Shape<DIM> for StructureShape<DIM> {
-    fn shape(&self) -> StructureShape<DIM> {
+impl Shape for StructureShape {
+    fn shape(&self) -> StructureShape {
         self.clone()
     }
 
     fn n_volume(&self) -> usize {
         self.iter().fold(1, |acc, x| acc * x) // mul all the elements by each other.
     }
+
+    fn rank(&self) -> usize {
+        todo!()
+    }
 }
 
-
-impl<const DIM: usize> Deref for StructureShape<DIM> {
+impl Deref for StructureShape {
     type Target = [usize];
 
     fn deref(&self) -> &Self::Target {
@@ -33,8 +37,8 @@ impl<const DIM: usize> Deref for StructureShape<DIM> {
     }
 }
 
-impl<const DIM: usize> From<[usize; DIM]> for StructureShape<DIM> {
-    fn from(value: [usize; DIM]) -> Self {
+impl From<Box<[usize]>> for StructureShape {
+    fn from(value: Box<[usize]>) -> Self {
         Self(value)
     }
 }

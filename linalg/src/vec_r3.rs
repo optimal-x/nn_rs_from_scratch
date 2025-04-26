@@ -10,13 +10,17 @@ impl<T> Vec3<T> {
 }
 
 ///====================== Vec3 Shape ======================
-impl<T> Shape<1> for Vec3<T> {
-    fn shape(&self) -> StructureShape<1> {
-        StructureShape::<1>::from([3])
+impl<T> Shape for Vec3<T> {
+    fn shape(&self) -> StructureShape {
+        StructureShape::from(vec![3].into_boxed_slice())
     }
 
     fn n_volume(&self) -> usize {
         3
+    }
+
+    fn rank(&self) -> usize {
+        1
     }
 } 
 

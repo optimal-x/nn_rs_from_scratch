@@ -71,13 +71,17 @@ impl<T> Arr2<T> {
     }
 }
 ///====================== Arr2 Shape ======================
-impl<T> Shape<2> for Arr2<T> {
-    fn shape(&self) -> StructureShape<2> {
-        StructureShape::<2>::from([self.len(), self[0].len()])
+impl<T> Shape for Arr2<T> {
+    fn shape(&self) -> StructureShape {
+        StructureShape::from(vec![self.len(), self[0].len()].into_boxed_slice())
     }
 
     fn n_volume(&self) -> usize {
         self.shape()[0] * self.shape()[1]
+    }
+
+    fn rank(&self) -> usize {
+        2
     }
 }
 
@@ -119,7 +123,7 @@ impl<T> Add for Arr2<T>
 where
     T: Add<Output = T>,
     T: RealFuncs<T>,
-    T: Clone + Copy
+    T: Clone + Copy,
 {
     type Output = Arr2<T>;
     fn add(self, rhs: Self) -> Self::Output {

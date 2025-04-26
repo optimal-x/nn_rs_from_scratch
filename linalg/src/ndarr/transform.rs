@@ -19,9 +19,7 @@ use crate::shape::Shape;
 /// tensor.reshape(StructureShape::<3>::from([1,2,3]));
 /// ```
 
-pub fn compute_strides<const DIM: usize>(
-    shape: &impl Shape<DIM>,
-) -> Vec<usize> {
+pub fn compute_strides(shape: &impl Shape) -> Vec<usize> {
     let structure_shape = shape.shape();
     let mut strides = vec![0usize; structure_shape.len()];
     let mut stride = 1usize;
@@ -34,9 +32,9 @@ pub fn compute_strides<const DIM: usize>(
     strides
 }
 
-pub fn matching_hypervolume<const DIM_1: usize, const DIM_2: usize>(
-    first: &impl Shape<DIM_1>,
-    second: &impl Shape<DIM_2>,
+pub fn matching_hypervolume<'a>(
+    first: &impl Shape,
+    second: &impl Shape,
 ) -> Result<(), TransformError> {
     if first.n_volume() == second.n_volume() {
         Ok(())
