@@ -1,7 +1,7 @@
 use super::container::Container;
 use crate::{
     number::RealFuncs,
-    shape::{Shape, StructureShape},
+    shape::{Shape, ShapeDescriptor},
 };
 use std::{iter::Sum, ops::*};
 
@@ -67,12 +67,12 @@ impl<T> Arr1<T> {
 ///====================== Arr1 Shape ======================
 impl<T> Shape for Arr1<T> {
     #[inline(always)]
-    fn shape(&self) -> StructureShape {
-        StructureShape::from(vec![self.0.len()].into_boxed_slice())
+    fn shape(&self) -> ShapeDescriptor {
+        ShapeDescriptor::from(vec![self.0.len()].into_boxed_slice())
     }
 
     #[inline(always)]
-    fn n_volume(&self) -> usize {
+    fn hypervolume(&self) -> usize {
         self.0.len()
     }
 

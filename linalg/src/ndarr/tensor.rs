@@ -34,6 +34,7 @@ where
         }
     }
 
+    #[must_use]
     pub fn set_transform(&mut self, transform: &'a dyn Transform) {
         self.transform = Some(transform);
     }

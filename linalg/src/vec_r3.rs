@@ -1,4 +1,4 @@
-use crate::shape::{Shape, StructureShape};
+use crate::shape::{Shape, ShapeDescriptor};
 
 ///====================== Vec3 ======================
 #[derive(Debug, Clone, Copy)]
@@ -11,11 +11,11 @@ impl<T> Vec3<T> {
 
 ///====================== Vec3 Shape ======================
 impl<T> Shape for Vec3<T> {
-    fn shape(&self) -> StructureShape {
-        StructureShape::from(vec![3].into_boxed_slice())
+    fn shape(&self) -> ShapeDescriptor {
+        ShapeDescriptor::from(vec![3].into_boxed_slice())
     }
 
-    fn n_volume(&self) -> usize {
+    fn hypervolume(&self) -> usize {
         3
     }
 

@@ -1,4 +1,4 @@
-use crate::{ndarr::container::Container, shape::{Shape, StructureShape}};
+use crate::{ndarr::container::Container, shape::{Shape, ShapeDescriptor}};
 
 ///====================== Vec2 ======================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -12,12 +12,12 @@ impl<T> Vec2<T> {
 ///====================== Vec2 Shape ======================
 impl<T> Shape for Vec2<T> {
     #[inline(always)]
-    fn shape(&self) -> StructureShape {
-        StructureShape::from(vec![2].into_boxed_slice())
+    fn shape(&self) -> ShapeDescriptor {
+        ShapeDescriptor::from(vec![2].into_boxed_slice())
     }
 
     #[inline(always)]
-    fn n_volume(&self) -> usize {
+    fn hypervolume(&self) -> usize {
         2
     }
 

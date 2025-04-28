@@ -1,6 +1,6 @@
 use crate::{
     number::RealFuncs,
-    shape::{Shape, StructureShape},
+    shape::{Shape, ShapeDescriptor},
 };
 use std::{iter::Sum, ops::*};
 
@@ -22,7 +22,6 @@ impl<T> Arr2<T> {
     pub fn matmul(self, rhs: Self) -> Self
     where
         T: Clone + Copy,
-        T: RealFuncs<T>,
         T: Mul<Output = T>,
         T: Default,
         T: Sum<T>,
@@ -49,7 +48,6 @@ impl<T> Arr2<T> {
     pub fn matadd(self, rhs: Self) -> Self
     where
         T: Clone + Copy,
-        T: RealFuncs<T>,
         T: Add<Output = T>,
     {
         let shape = self.shape();
@@ -70,13 +68,14 @@ impl<T> Arr2<T> {
         Arr2::from(collector)
     }
 }
+
 ///====================== Arr2 Shape ======================
 impl<T> Shape for Arr2<T> {
-    fn shape(&self) -> StructureShape {
-        StructureShape::from(vec![self.len(), self[0].len()].into_boxed_slice())
+    fn shape(&self) -> ShapeDescriptor {
+        ShapeDescriptor::from(vec![self.len(), self[0].len()].into_boxed_slice())
     }
 
-    fn n_volume(&self) -> usize {
+    fn hypervolume(&self) -> usize {
         self.shape()[0] * self.shape()[1]
     }
 
