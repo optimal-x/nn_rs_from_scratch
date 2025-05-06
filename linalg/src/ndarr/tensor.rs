@@ -1,6 +1,8 @@
 use super::{container::Container, transform::Transform};
 use std::marker::PhantomData;
 
+// ======================= Container =======================
+/// .
 pub struct Tensor<'a, T, Ct>
 where
     Ct: Container<T>,
@@ -34,6 +36,13 @@ where
         }
     }
 
+    /// The intention behind the transform is for the it and the tensor
+    /// to be losely connected s.t. the transform can technically exist as its
+    /// own object without guidance of any one tensor.
+    /// 
+    /// This means the a transform can technically be used on another tensor
+    /// without needing a tensor to start with. Also meaning that you can
+    /// do arbirary shaping and manipulation without a Tensor.
     #[must_use]
     pub fn set_transform(&mut self, transform: &'a dyn Transform) {
         self.transform = Some(transform);
