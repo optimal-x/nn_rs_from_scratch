@@ -1,6 +1,6 @@
 use super::vec_r2::Vec2;
 use crate::ndarr::arr1::Arr1;
-use crate::ndarr::container::Container;
+use crate::ndarr::container::Device;
 
 #[test]
 pub(self) fn test_add() {

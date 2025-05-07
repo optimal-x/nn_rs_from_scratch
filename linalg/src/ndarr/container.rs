@@ -1,7 +1,5 @@
-use crate::shape::Shape;
-
 // ======================= Container =======================
-pub trait Container<T>: Shape {
+pub trait Device<T> {
     fn at(&self, indicies: &[usize]) -> Option<&T>;
     fn set_at(&mut self, indicies: &[usize], value: T);
 }

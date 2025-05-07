@@ -1,5 +1,6 @@
 use std::ops::Deref;
 
+// ======================= Shape =======================
 pub trait Shape {
     /// the number of physical dimensions that the shape has
     fn rank(&self) -> usize;
@@ -12,6 +13,7 @@ pub trait Shape {
     fn hypervolume(&self) -> usize;
 }
 
+// ======================= ShapeDescriptor =======================
 #[derive(Debug, PartialEq, Clone)]
 pub struct ShapeDescriptor(pub Box<[usize]>);
 
@@ -21,12 +23,14 @@ impl Shape for ShapeDescriptor {
         self.clone()
     }
 
+    #[inline]
     fn hypervolume(&self) -> usize {
         self.iter().fold(1, |acc, x| acc * x) // mul all the elements by each other.
     }
 
+    #[inline]
     fn rank(&self) -> usize {
-        todo!()
+        self.len()
     }
 }
 
@@ -41,5 +45,19 @@ impl Deref for ShapeDescriptor {
 impl From<Box<[usize]>> for ShapeDescriptor {
     fn from(value: Box<[usize]>) -> Self {
         Self(value)
+    }
+}
+
+impl<'a, T> Shape for &'a [T] {
+    fn rank(&self) -> usize {
+        self.shape().len()
+    }
+
+    fn shape(&self) -> ShapeDescriptor {
+        todo!()
+    }
+
+    fn hypervolume(&self) -> usize {
+        self.shape().hypervolume()
     }
 }

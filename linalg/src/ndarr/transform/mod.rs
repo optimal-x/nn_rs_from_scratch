@@ -9,7 +9,7 @@ pub mod concrete_transformers;
 ///
 /// Example:
 /// ```rs
-/// // some 2x3 tensor
+/// // some 2x3 tensor, but its contiguous
 /// // [[0 0 0] [0 0 0]]
 /// let mut tensor = Tensor::<2>::new(vec![vec![0; 3]; 2]);
 ///
@@ -37,11 +37,22 @@ where
     F: Fn(usize) -> T,
 {
     let mut boxed_uninit = Box::<[T]>::new_uninit_slice(size);
-    for (i, slot) in boxed_uninit.iter_mut().enumerate() {
-        slot.write(f(i));
+    for (idx, slot) in boxed_uninit.iter_mut().enumerate() {
+        slot.write(f(idx));
     }
 
     // SAFETY: All elements are initialized above, so it's safe to assume_init
+    unsafe { boxed_uninit.assume_init() }
+}
+
+pub fn default_boxed_slice<T: Default>(size: usize) -> Box<[T]> {
+    let mut boxed_uninit = Box::<[T]>::new_uninit_slice(size);
+    boxed_uninit.iter_mut().for_each(|slot| {
+        slot.write(T::default());
+    });
+
+    // SAFETY: All elements are initialized above because of default,
+    // so it's safe to assume_init
     unsafe { boxed_uninit.assume_init() }
 }
 
@@ -49,7 +60,7 @@ where
 /// .
 pub fn compute_strides(shape: &impl Shape) -> Box<[usize]> {
     let structure_shape = shape.shape();
-    let mut strides = vec![0usize; structure_shape.len()];
+    let mut strides = default_boxed_slice(structure_shape.len());
     let mut stride = 1usize;
 
     for i in (0..structure_shape.len()).rev() {

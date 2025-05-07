@@ -1,4 +1,4 @@
-use super::container::Container;
+use super::container::Device;
 use crate::{
     number::RealFuncs,
     shape::{Shape, ShapeDescriptor},
@@ -7,10 +7,10 @@ use std::{iter::Sum, ops::*};
 
 ///====================== Arr1 ======================
 #[derive(Debug, Clone)]
-pub struct Arr1<T>(Vec<T>);
+pub struct Arr1<T>(Box<[T]>);
 
 impl<T> Arr1<T> {
-    pub fn new(container: Vec<T>) -> Self {
+    pub fn new(container: Box<[T]>) -> Self {
         Self(container)
     }
 
@@ -82,7 +82,7 @@ impl<T> Shape for Arr1<T> {
 }
 
 ///====================== Arr1 Container ======================
-impl<T> Container<T> for Arr1<T> {
+impl<T> Device<T> for Arr1<T> {
     fn at(&self, indicies: &[usize]) -> Option<&T> {
         assert_eq!(indicies.len(), self.rank());
         Some(&self.0[indicies[0]])
@@ -96,7 +96,7 @@ impl<T> Container<T> for Arr1<T> {
 
 ///====================== Arr1 Deref ======================
 impl<T> Deref for Arr1<T> {
-    type Target = Vec<T>;
+    type Target = Box<[T]>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -114,6 +114,6 @@ impl<T> DerefMut for Arr1<T> {
 impl<T> From<Vec<T>> for Arr1<T> {
     #[inline]
     fn from(value: Vec<T>) -> Self {
-        Self::new(value)
+        Self::new(value.into())
     }
 }

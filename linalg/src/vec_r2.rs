@@ -1,4 +1,4 @@
-use crate::{ndarr::container::Container, shape::{Shape, ShapeDescriptor}};
+use crate::{ndarr::container::Device, shape::{Shape, ShapeDescriptor}};
 
 ///====================== Vec2 ======================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ impl<T> Shape for Vec2<T> {
 }
 
 ///====================== Vec2 Container ======================
-impl<T> Container<T> for Vec2<T> {
+impl<T> Device<T> for Vec2<T> {
     fn at(&self, indicies: &[usize]) -> Option<&T> {
         assert_eq!(indicies.len(), self.rank());
         Some(&self.0[indicies[0]])
