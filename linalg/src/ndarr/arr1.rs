@@ -1,4 +1,4 @@
-use super::container::Device;
+use super::tensor::Tensor;
 use crate::{
     number::RealFuncs,
     shape::{Shape, ShapeDescriptor},
@@ -6,12 +6,13 @@ use crate::{
 use std::{iter::Sum, ops::*};
 
 ///====================== Arr1 ======================
-#[derive(Debug, Clone)]
-pub struct Arr1<T>(Box<[T]>);
+#[derive(Clone)]
+pub struct Arr1<'a, T>(Tensor<'a, T>);
 
-impl<T> Arr1<T> {
-    pub fn new(container: Box<[T]>) -> Self {
-        Self(container)
+impl<'a, T> Arr1<'a, T> {
+    pub fn new(data: Box<[T]>) -> Self {
+        let size = data.len();
+        Self(Tensor::new(data, ShapeDescriptor(Box::new([size]))))
     }
 
     pub fn distance(&self, rhs: &Self) -> T
@@ -65,7 +66,7 @@ impl<T> Arr1<T> {
 }
 
 ///====================== Arr1 Shape ======================
-impl<T> Shape for Arr1<T> {
+impl<'a, T> Shape for Arr1<'a, T> {
     #[inline(always)]
     fn shape(&self) -> ShapeDescriptor {
         ShapeDescriptor::from(vec![self.0.len()].into_boxed_slice())
@@ -81,21 +82,8 @@ impl<T> Shape for Arr1<T> {
     }
 }
 
-///====================== Arr1 Container ======================
-impl<T> Device<T> for Arr1<T> {
-    fn at(&self, indicies: &[usize]) -> Option<&T> {
-        assert_eq!(indicies.len(), self.rank());
-        Some(&self.0[indicies[0]])
-    }
-
-    fn set_at(&mut self, indicies: &[usize], value: T) {
-        assert_eq!(indicies.len(), self.rank());
-        self.0[indicies[0]] = value;
-    }
-}
-
 ///====================== Arr1 Deref ======================
-impl<T> Deref for Arr1<T> {
+impl<'a, T> Deref for Arr1<'a, T> {
     type Target = Box<[T]>;
 
     fn deref(&self) -> &Self::Target {
@@ -104,14 +92,14 @@ impl<T> Deref for Arr1<T> {
 }
 
 ///====================== Arr1 DerefMut ======================
-impl<T> DerefMut for Arr1<T> {
+impl<'a, T> DerefMut for Arr1<'a, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
 ///====================== Arr1 From<Vec<U>> ======================
-impl<T> From<Vec<T>> for Arr1<T> {
+impl<'a, T> From<Vec<T>> for Arr1<'a, T> {
     #[inline]
     fn from(value: Vec<T>) -> Self {
         Self::new(value.into())

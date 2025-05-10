@@ -1,4 +1,4 @@
-use crate::{ndarr::container::Device, shape::{Shape, ShapeDescriptor}};
+use crate::{ndarr::device::Device, shape::{Shape, ShapeDescriptor}};
 
 ///====================== Vec2 ======================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,19 +26,6 @@ impl<T> Shape for Vec2<T> {
         1
     }
 
-}
-
-///====================== Vec2 Container ======================
-impl<T> Device<T> for Vec2<T> {
-    fn at(&self, indicies: &[usize]) -> Option<&T> {
-        assert_eq!(indicies.len(), self.rank());
-        Some(&self.0[indicies[0]])
-    }
-
-    fn set_at(&mut self, indicies: &[usize], value: T) {
-        assert_eq!(indicies.len(), self.rank());
-        self.0[indicies[0]] = value;
-    }
 }
 
 ///====================== Vec2 Neg ======================

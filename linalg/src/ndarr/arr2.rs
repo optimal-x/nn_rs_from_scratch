@@ -1,14 +1,24 @@
+
 use crate::{
+    ndarr::transform::{
+        compute_flat_index, compute_strides, default_boxed_slice,
+    },
     number::RealFuncs,
     shape::{Shape, ShapeDescriptor},
 };
 use std::{iter::Sum, ops::*};
 
-///====================== Arr2 ======================
-#[derive(Debug, Clone)]
-pub struct Arr2<T>(Vec<Vec<T>>);
+use super::tensor::Tensor;
 
-impl<T> Arr2<T> {
+//====================== Arr2 ======================
+pub struct Arr2<'a, T>(Tensor<'a, T>);
+
+
+impl<'a, T> Arr2<'a, T> {
+    pub fn new(data: Box<[T]>, shape: (usize, usize)) -> Self {
+        Self(Tensor::new(data, ShapeDescriptor(Box::new([shape.0, shape.1]))))
+    }
+    
     #[inline]
     pub fn rows(&self) -> usize {
         self.shape()[0]
@@ -35,20 +45,28 @@ impl<T> Arr2<T> {
             "[[linalg]] Matrix multiplication dimensions mismatch"
         );
 
-        let mut result = vec![vec![T::default(); p]; m];
+        let mut buff: Box<[T]> = default_boxed_slice(m * p);
+        let strides = compute_strides(&self.shape());
+
         for i in 0..m {
             for j in 0..p {
-                result[i][j] = (0..n).map(|k| self[i][k] * rhs[k][j]).sum();
+                let logical = [i, j];
+                let flat = compute_flat_index(&logical, &strides);
+
+                (0..n).for_each(|k| {
+                    buff[flat] = self[[i, k]] * rhs[[k, j]];
+                });
             }
         }
 
-        Arr2::from(result)
+        Arr2::new(buff, (m, p))
     }
 
     pub fn matadd(self, rhs: Self) -> Self
     where
         T: Clone + Copy,
         T: Add<Output = T>,
+        T: Default,
     {
         let shape = self.shape();
         assert_eq!(
@@ -59,20 +77,24 @@ impl<T> Arr2<T> {
 
         let (m, n) = (shape[0], shape[1]);
 
-        let mut collector: Vec<Vec<T>> = vec![Vec::with_capacity(n); m];
+        let mut buff: Box<[T]> = default_boxed_slice(m * n);
+        let strides = compute_strides(&self.shape());
         for i in 0..m {
             for j in 0..n {
-                collector[i][j] = self[i][j] + rhs[i][j];
+                let logical = [i, j];
+                let flat = compute_flat_index(&logical, &strides);
+                buff[flat] = self[[i, j]] + rhs[[i, j]];
             }
         }
-        Arr2::from(collector)
+        
+        Arr2::new(buff, (m,n))
     }
 }
 
 ///====================== Arr2 Shape ======================
-impl<T> Shape for Arr2<T> {
+impl<'a, T> Shape for Arr2<'a, T> {
     fn shape(&self) -> ShapeDescriptor {
-        ShapeDescriptor::from(vec![self.len(), self[0].len()].into_boxed_slice())
+        self.0.shape()
     }
 
     fn hypervolume(&self) -> usize {
@@ -85,25 +107,33 @@ impl<T> Shape for Arr2<T> {
 }
 
 ///====================== Arr2 Deref ======================
-impl<T> Deref for Arr2<T> {
-    type Target = Vec<Vec<T>>;
+impl<'a, T> Deref for Arr2<'a, T> {
+    type Target = Tensor<'a, T>;
 
     #[inline]
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
+ 
+///====================== Arr2 DerefMut ======================
+impl<'a, T> DerefMut for Arr2<'a, T> {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 
-///====================== Arr2 Deref ======================
-impl<T> From<Vec<Vec<T>>> for Arr2<T> {
+///====================== Arr2 From<Vec<Vec<T>>>======================
+impl<'a, T> From<Vec<Vec<T>>> for Arr2<'a, T> {
     #[inline]
     fn from(value: Vec<Vec<T>>) -> Self {
-        Self(value)
+        todo!()
     }
 }
 
 ///====================== Arr2 Mul ======================
-impl<T> Mul for Arr2<T>
+impl<'a, T> Mul for Arr2<'a, T>
 where
     T: Mul<Output = T>,
     T: Sum<T>,
@@ -111,21 +141,42 @@ where
     T: RealFuncs<T>,
     T: Clone + Copy,
 {
-    type Output = Arr2<T>;
+    type Output = Arr2<'a, T>;
     fn mul(self, rhs: Self) -> Self::Output {
         self.matmul(rhs)
     }
 }
 
 ///====================== Arr2 Add ======================
-impl<T> Add for Arr2<T>
+impl<'a, T> Add for Arr2<'a, T>
 where
     T: Add<Output = T>,
     T: RealFuncs<T>,
     T: Clone + Copy,
+    T: Default
 {
-    type Output = Arr2<T>;
+    type Output = Arr2<'a, T>;
     fn add(self, rhs: Self) -> Self::Output {
         self.matadd(rhs)
+    }
+}
+
+///====================== Arr2 Index ======================
+impl<'a, T> Index<[usize; 2]> for Arr2<'a, T> {
+    type Output = T;
+
+    fn index(&self, logical: [usize; 2]) -> &Self::Output {
+        let strides = compute_strides(&self.shape());
+        let flat = compute_flat_index(&logical, &strides);
+        &self.0[flat]
+    }
+}
+
+///====================== Arr2 IndexMut ======================
+impl<'a, T> IndexMut<[usize; 2]> for Arr2<'a, T> {
+    fn index_mut(&mut self, logical: [usize; 2]) -> &mut Self::Output {
+        let strides = compute_strides(&self.shape());
+        let flat = compute_flat_index(&logical, &strides);
+        &mut self.0[flat]
     }
 }

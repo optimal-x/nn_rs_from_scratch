@@ -50,28 +50,25 @@ impl<'a> Transform for ChainedTransforms<'a> {
 
 // ======================= ReshapeTransform =======================
 /// .
-pub struct ReshapeTransform {
-    pub in_shape: ShapeDescriptor, // needed for computing to flat index from in_shape logical.
-    pub out_shape: ShapeDescriptor, // needed for computing to out_shape logical from flat index.
-    pub strides: Box<[usize]>, // only one set of strides since both volumes will always be the same.
+pub struct ReshapeTransform<'a> {
+    src_shape: &'a ShapeDescriptor,
+    dst_shape: ShapeDescriptor,
+    strides: Box<[usize]>, // needed for computing to out_shape logical from flat index.
 }
 
-impl ReshapeTransform {
-    pub fn new(in_shape: ShapeDescriptor, out_shape: ShapeDescriptor) -> Result<Self, TransformError> {
-        if in_shape.hypervolume() != out_shape.hypervolume() {
-            return Err(TransformError::MisMatchHypervolume);
-        }
-
-        let strides = compute_strides(&in_shape);
+impl<'a> ReshapeTransform<'a> {
+    pub fn new(src: &'a ShapeDescriptor, dst: ShapeDescriptor) -> Result<Self, TransformError> {
+        let strides = src.strides();
         Ok(Self {
-            in_shape,
-            out_shape,
-            strides,
+            src_shape: src,
+            dst_shape: dst,
+            strides
         })
     }
 }
 
-impl Transform for ReshapeTransform {
+// ======================= ReshapeTransform Transform =======================
+impl<'a> Transform for ReshapeTransform<'a> {
     fn to_flat(&self, logical: &[usize]) -> usize {
         todo!()
     }
@@ -81,7 +78,7 @@ impl Transform for ReshapeTransform {
     }
 
     fn shape(&self) -> &[usize] {
-        &self.out_shape
+        &self.dst_shape
     }
 
     fn strides(&self) -> Cow<[usize]> {

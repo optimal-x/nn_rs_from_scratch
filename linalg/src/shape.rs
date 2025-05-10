@@ -1,5 +1,7 @@
 use std::ops::Deref;
 
+use crate::ndarr::transform::compute_strides;
+
 // ======================= Shape =======================
 pub trait Shape {
     /// the number of physical dimensions that the shape has
@@ -11,6 +13,10 @@ pub trait Shape {
     /// the total n-volume of a given shape, sometimes refered to as hypervolume.
     /// For example, in 5 dimensional shape we'd say it a has a 5-volume.
     fn hypervolume(&self) -> usize;
+
+    fn strides(&self) -> Box<[usize]> {
+        compute_strides(&self.shape())
+    }
 }
 
 // ======================= ShapeDescriptor =======================
@@ -34,6 +40,7 @@ impl Shape for ShapeDescriptor {
     }
 }
 
+// ======================= ShapeDescriptor Deref =======================
 impl Deref for ShapeDescriptor {
     type Target = [usize];
 
@@ -42,22 +49,9 @@ impl Deref for ShapeDescriptor {
     }
 }
 
+// ======================= ShapeDescriptor From<Box<[usize]>> =======================
 impl From<Box<[usize]>> for ShapeDescriptor {
     fn from(value: Box<[usize]>) -> Self {
         Self(value)
-    }
-}
-
-impl<'a, T> Shape for &'a [T] {
-    fn rank(&self) -> usize {
-        self.shape().len()
-    }
-
-    fn shape(&self) -> ShapeDescriptor {
-        todo!()
-    }
-
-    fn hypervolume(&self) -> usize {
-        self.shape().hypervolume()
     }
 }
