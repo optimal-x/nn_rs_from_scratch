@@ -1,6 +1,6 @@
 // conrete_transform.rs
-use super::{compute_flat_index, compute_strides, Transform, TransformError};
-use crate::shape::{Shape, ShapeDescriptor};
+use super::{compute_flat_index, Transform, TransformError};
+use crate::shape::{ShapeDescriptor, Shape};
 use std::borrow::Cow;
 
 // ======================= IdentityTransform =======================
@@ -11,7 +11,7 @@ pub struct IdentityTransform(pub ShapeDescriptor);
 
 impl Transform for IdentityTransform {
     fn to_flat(&self, logical: &[usize]) -> usize {
-        let strides = compute_strides(&self.0);
+        let strides = self.0.compute_strides();
         compute_flat_index(logical, &strides)
     }
 
@@ -20,7 +20,8 @@ impl Transform for IdentityTransform {
     }
 
     fn strides(&self) -> Cow<[usize]> {
-        Cow::Owned(compute_strides(&self.0).into())
+        let strides = self.0.compute_strides();
+        Cow::Owned(strides.into())
     }
 }
 
@@ -30,7 +31,8 @@ pub struct ChainedTransforms<'a> {
     pub stages: Vec<&'a dyn Transform>,
 }
 
-impl<'a> Transform for ChainedTransforms<'a> {
+// ======================= ChainedTransforms Transform =======================
+impl Transform for ChainedTransforms<'_> {
     fn to_flat(&self, logical: &[usize]) -> usize {
         todo!()
     }
@@ -58,7 +60,7 @@ pub struct ReshapeTransform<'a> {
 
 impl<'a> ReshapeTransform<'a> {
     pub fn new(src: &'a ShapeDescriptor, dst: ShapeDescriptor) -> Result<Self, TransformError> {
-        let strides = src.strides();
+        let strides = src.compute_strides();
         Ok(Self {
             src_shape: src,
             dst_shape: dst,
@@ -68,7 +70,7 @@ impl<'a> ReshapeTransform<'a> {
 }
 
 // ======================= ReshapeTransform Transform =======================
-impl<'a> Transform for ReshapeTransform<'a> {
+impl Transform for ReshapeTransform<'_> {
     fn to_flat(&self, logical: &[usize]) -> usize {
         todo!()
     }

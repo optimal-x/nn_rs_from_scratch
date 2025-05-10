@@ -1,4 +1,3 @@
-
 pub trait ActivationFunction {
     type OutputZ;
     fn a() -> Self::OutputZ;
@@ -7,7 +6,6 @@ pub trait ActivationFunction {
 
 struct ReLU;
 impl ActivationFunction for ReLU {
-
     fn a() -> Self::OutputZ {
         // In our case Z is a vector of weight-bias input-outputs
         //

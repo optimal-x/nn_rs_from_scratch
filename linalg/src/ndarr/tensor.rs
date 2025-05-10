@@ -1,6 +1,6 @@
 use crate::shape::{Shape, ShapeDescriptor};
-pub(crate) use super::transform::{compute_strides, Transform};
-use std::marker::PhantomData;
+pub(crate) use super::transform::Transform;
+use std::{borrow::Cow, marker::PhantomData};
 
 // ======================= Container =======================
 /// .
@@ -16,7 +16,7 @@ pub struct Tensor<'a, T>
 
 impl<'a, T> Tensor<'a, T> {
     pub fn new(data: Box<[T]>, shape: ShapeDescriptor) -> Self {
-        let strides = compute_strides(&shape);
+        let strides = shape.compute_strides();
         Self {
             dtype: PhantomData::<T>,
             transform: None,
@@ -26,12 +26,16 @@ impl<'a, T> Tensor<'a, T> {
         }
     }
     
-    pub fn data(&self) -> &Box<[T]> {
+    pub fn data(&self) -> &[T] {
         &self.data
     }
 
+    pub fn strides(&self) -> &[usize] {
+        &self.strides
+    }
+
     pub fn transform(&self) -> Option<&dyn Transform> {
-        if let Some(transform) = self.transform.as_deref() {
+        if let Some(transform) = self.transform {
             Some(transform)
         } else {
             None
@@ -45,19 +49,18 @@ impl<'a, T> Tensor<'a, T> {
     /// This means the a transform can technically be used on another tensor
     /// without needing a tensor to start with. Also meaning that you can
     /// do arbirary shaping and manipulation without a Tensor.
-    #[must_use]
     pub fn set_transform(&mut self, transform: &'a dyn Transform) {
         self.transform = Some(transform);
     }
 }
 
-impl<'a, T> Shape for Tensor<'a, T> {
+impl<T> Shape for Tensor<'_, T> {
     fn rank(&self) -> usize {
         self.shape.rank()
     }
 
-    fn shape(&self) -> ShapeDescriptor {
-        self.shape.shape()
+    fn shape(&self) -> Cow<ShapeDescriptor >{
+        Cow::Borrowed(&self.shape)
     }
 
     fn hypervolume(&self) -> usize {
@@ -66,15 +69,15 @@ impl<'a, T> Shape for Tensor<'a, T> {
 }
 
 
-impl<'a, T> std::ops::Deref for Tensor<'a, T> {
-    type Target = Box<[T]>;
+impl<T> std::ops::Deref for Tensor<'_, T> {
+    type Target = [T];
 
     fn deref(&self) -> &Self::Target {
         self.data()
     }
 }
 
-impl<'a, T> std::ops::DerefMut for Tensor<'a, T> {
+impl<T> std::ops::DerefMut for Tensor<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.data
     }

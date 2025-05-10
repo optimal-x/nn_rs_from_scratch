@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::shape::{Shape, ShapeDescriptor};
 
 ///====================== Vec3 ======================
@@ -11,8 +13,8 @@ impl<T> Vec3<T> {
 
 ///====================== Vec3 Shape ======================
 impl<T> Shape for Vec3<T> {
-    fn shape(&self) -> ShapeDescriptor {
-        ShapeDescriptor::from(vec![3].into_boxed_slice())
+    fn shape(&self) -> Cow<ShapeDescriptor> {
+        Cow::Owned(ShapeDescriptor::from(vec![3].into_boxed_slice()))
     }
 
     fn hypervolume(&self) -> usize {
@@ -22,7 +24,7 @@ impl<T> Shape for Vec3<T> {
     fn rank(&self) -> usize {
         1
     }
-} 
+}
 
 ///====================== Vec3 Neg ======================
 impl<T> std::ops::Neg for Vec3<T>

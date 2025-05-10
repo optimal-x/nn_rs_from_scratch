@@ -1,12 +1,12 @@
 
 use crate::{
     ndarr::transform::{
-        compute_flat_index, compute_strides, default_boxed_slice,
+        compute_flat_index, default_boxed_slice,
     },
     number::RealFuncs,
     shape::{Shape, ShapeDescriptor},
 };
-use std::{iter::Sum, ops::*};
+use std::{borrow::Cow, iter::Sum, ops::*};
 
 use super::tensor::Tensor;
 
@@ -14,7 +14,7 @@ use super::tensor::Tensor;
 pub struct Arr2<'a, T>(Tensor<'a, T>);
 
 
-impl<'a, T> Arr2<'a, T> {
+impl<T> Arr2<'_, T> {
     pub fn new(data: Box<[T]>, shape: (usize, usize)) -> Self {
         Self(Tensor::new(data, ShapeDescriptor(Box::new([shape.0, shape.1]))))
     }
@@ -46,12 +46,12 @@ impl<'a, T> Arr2<'a, T> {
         );
 
         let mut buff: Box<[T]> = default_boxed_slice(m * p);
-        let strides = compute_strides(&self.shape());
+        let strides = self.strides();
 
         for i in 0..m {
             for j in 0..p {
                 let logical = [i, j];
-                let flat = compute_flat_index(&logical, &strides);
+                let flat = compute_flat_index(&logical, strides);
 
                 (0..n).for_each(|k| {
                     buff[flat] = self[[i, k]] * rhs[[k, j]];
@@ -78,11 +78,11 @@ impl<'a, T> Arr2<'a, T> {
         let (m, n) = (shape[0], shape[1]);
 
         let mut buff: Box<[T]> = default_boxed_slice(m * n);
-        let strides = compute_strides(&self.shape());
+        let strides = self.strides();
         for i in 0..m {
             for j in 0..n {
                 let logical = [i, j];
-                let flat = compute_flat_index(&logical, &strides);
+                let flat = compute_flat_index(&logical, strides);
                 buff[flat] = self[[i, j]] + rhs[[i, j]];
             }
         }
@@ -92,8 +92,8 @@ impl<'a, T> Arr2<'a, T> {
 }
 
 ///====================== Arr2 Shape ======================
-impl<'a, T> Shape for Arr2<'a, T> {
-    fn shape(&self) -> ShapeDescriptor {
+impl<T> Shape for Arr2<'_, T> {
+    fn shape(&self) -> Cow<ShapeDescriptor >{
         self.0.shape()
     }
 
@@ -117,7 +117,7 @@ impl<'a, T> Deref for Arr2<'a, T> {
 }
  
 ///====================== Arr2 DerefMut ======================
-impl<'a, T> DerefMut for Arr2<'a, T> {
+impl<T> DerefMut for Arr2<'_, T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
@@ -125,7 +125,7 @@ impl<'a, T> DerefMut for Arr2<'a, T> {
 }
 
 ///====================== Arr2 From<Vec<Vec<T>>>======================
-impl<'a, T> From<Vec<Vec<T>>> for Arr2<'a, T> {
+impl<T> From<Vec<Vec<T>>> for Arr2<'_, T> {
     #[inline]
     fn from(value: Vec<Vec<T>>) -> Self {
         todo!()
@@ -162,21 +162,21 @@ where
 }
 
 ///====================== Arr2 Index ======================
-impl<'a, T> Index<[usize; 2]> for Arr2<'a, T> {
+impl<T> Index<[usize; 2]> for Arr2<'_, T> {
     type Output = T;
 
     fn index(&self, logical: [usize; 2]) -> &Self::Output {
-        let strides = compute_strides(&self.shape());
-        let flat = compute_flat_index(&logical, &strides);
+        let strides = self.strides();
+        let flat = compute_flat_index(&logical, strides);
         &self.0[flat]
     }
 }
 
 ///====================== Arr2 IndexMut ======================
-impl<'a, T> IndexMut<[usize; 2]> for Arr2<'a, T> {
+impl<T> IndexMut<[usize; 2]> for Arr2<'_, T> {
     fn index_mut(&mut self, logical: [usize; 2]) -> &mut Self::Output {
-        let strides = compute_strides(&self.shape());
-        let flat = compute_flat_index(&logical, &strides);
+        let strides = self.strides();
+        let flat = compute_flat_index(&logical, strides);
         &mut self.0[flat]
     }
 }

@@ -1,15 +1,15 @@
-use super::tensor::Tensor;
+use super::{tensor::Tensor, transform::compute_flat_index};
 use crate::{
     number::RealFuncs,
     shape::{Shape, ShapeDescriptor},
 };
-use std::{iter::Sum, ops::*};
+use std::{borrow::Cow, iter::Sum, ops::*};
 
 ///====================== Arr1 ======================
 #[derive(Clone)]
 pub struct Arr1<'a, T>(Tensor<'a, T>);
 
-impl<'a, T> Arr1<'a, T> {
+impl<T> Arr1<'_, T> {
     pub fn new(data: Box<[T]>) -> Self {
         let size = data.len();
         Self(Tensor::new(data, ShapeDescriptor(Box::new([size]))))
@@ -66,11 +66,11 @@ impl<'a, T> Arr1<'a, T> {
 }
 
 ///====================== Arr1 Shape ======================
-impl<'a, T> Shape for Arr1<'a, T> {
+impl<T> Shape for Arr1<'_, T> {
     #[inline(always)]
-    fn shape(&self) -> ShapeDescriptor {
-        ShapeDescriptor::from(vec![self.0.len()].into_boxed_slice())
-    }
+    fn shape(&self) -> Cow<ShapeDescriptor> {
+        self.0.shape()
+   }
 
     #[inline(always)]
     fn hypervolume(&self) -> usize {
@@ -84,7 +84,7 @@ impl<'a, T> Shape for Arr1<'a, T> {
 
 ///====================== Arr1 Deref ======================
 impl<'a, T> Deref for Arr1<'a, T> {
-    type Target = Box<[T]>;
+    type Target = Tensor<'a, T>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -92,16 +92,36 @@ impl<'a, T> Deref for Arr1<'a, T> {
 }
 
 ///====================== Arr1 DerefMut ======================
-impl<'a, T> DerefMut for Arr1<'a, T> {
+impl<T> DerefMut for Arr1<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
 ///====================== Arr1 From<Vec<U>> ======================
-impl<'a, T> From<Vec<T>> for Arr1<'a, T> {
+impl<T> From<Vec<T>> for Arr1<'_, T> {
     #[inline]
     fn from(value: Vec<T>) -> Self {
         Self::new(value.into())
+    }
+}
+
+///====================== Arr1 Index ======================
+impl<T> Index<[usize; 1]> for Arr1<'_, T> {
+    type Output = T;
+
+    fn index(&self, logical: [usize; 1]) -> &Self::Output {
+        let strides = self.strides();
+        let flat = compute_flat_index(&logical, strides);
+        &self.0[flat]
+    }
+}
+
+//====================== Arr1 IndexMut ======================
+impl<T> IndexMut<[usize; 1]> for Arr1<'_, T> {
+    fn index_mut(&mut self, logical: [usize; 1]) -> &mut Self::Output {
+        let strides = self.strides();
+        let flat = compute_flat_index(&logical, strides);
+        &mut self.0[flat]
     }
 }

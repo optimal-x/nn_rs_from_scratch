@@ -45,6 +45,8 @@ where
     unsafe { boxed_uninit.assume_init() }
 }
 
+// ======================= default_boxed_slice =======================
+/// .
 pub fn default_boxed_slice<T: Default>(size: usize) -> Box<[T]> {
     let mut boxed_uninit = Box::<[T]>::new_uninit_slice(size);
     boxed_uninit.iter_mut().for_each(|slot| {
@@ -58,6 +60,7 @@ pub fn default_boxed_slice<T: Default>(size: usize) -> Box<[T]> {
 
 // ======================= compute_strides =======================
 /// .
+#[deprecated]
 pub fn compute_strides(shape: &impl Shape) -> Box<[usize]> {
     let structure_shape = shape.shape();
     let mut strides = default_boxed_slice(structure_shape.len());
@@ -68,7 +71,7 @@ pub fn compute_strides(shape: &impl Shape) -> Box<[usize]> {
         strides[i] = stride;
         stride *= structure_shape[i];
     }
-    strides.into()
+    strides
 }
 
 // ======================= compute_flat_index =======================
@@ -83,7 +86,7 @@ pub fn compute_flat_index(logical: &[usize], strides: &[usize]) -> usize {
 
 // ======================= matching_hypervolume =======================
 /// .
-pub fn matching_hypervolume<'a>(
+pub fn matching_hypervolume(
     first: &impl Shape,
     second: &impl Shape,
 ) -> Result<(), TransformError> {

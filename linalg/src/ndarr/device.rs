@@ -1,19 +1,25 @@
 use super::tensor::Tensor;
 
 pub enum DeviceError {
-    HandleError
+    HandleError,
 }
 
 // ======================= Device =======================
 pub trait Device<'a> {
-    fn upload<T>(&self, tensor: &Tensor<T>) -> Result<DeviceTensorHandle<T>, DeviceError>;
+    fn upload<T>(
+        &self,
+        tensor: &Tensor<T>,
+    ) -> Result<DeviceTensorHandle<T>, DeviceError>;
     fn launch_kernel();
-    fn download<T>(&self, handle: &DeviceTensorHandle<T>) -> Result<Tensor<T>, DeviceTensorHandle<T>>;
+    fn download<T>(
+        &self,
+        handle: &DeviceTensorHandle<T>,
+    ) -> Result<Tensor<T>, DeviceTensorHandle<T>>;
 }
 
 // ======================= DeviceBackend =======================
 pub struct DeviceTensorHandle<T> {
-    temp: T // TODO remove and figure out a good use for the type LOL
+    temp: T, // TODO remove and figure out a good use for the type LOL
 }
 
 #[derive(Default)]

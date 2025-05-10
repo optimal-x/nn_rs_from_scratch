@@ -34,9 +34,9 @@ pub(self) fn test_arr1_deref() {
 #[test]
 pub(self) fn test_arr1_get() {
     let arr1 = Arr1::from(vec![0.0; 10]);
-    assert_eq!(Some(&0.0), arr1.at(&[0usize]));
-    assert_eq!(Some(&0.0), arr1.at(&[2usize]));
-    assert_eq!(Some(&0.0), arr1.at(&[0usize]));
+    assert_eq!(Some(&0.0), arr1[&[0usize]]);
+    assert_eq!(Some(&0.0), arr1[&[2usize]]);
+    assert_eq!(Some(&0.0), arr1[&[0usize]]);
 }
 
 #[test]

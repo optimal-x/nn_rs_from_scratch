@@ -1,4 +1,6 @@
-use crate::{ndarr::device::Device, shape::{Shape, ShapeDescriptor}};
+use std::borrow::Cow;
+
+use crate::shape::{Shape, ShapeDescriptor};
 
 ///====================== Vec2 ======================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -12,8 +14,8 @@ impl<T> Vec2<T> {
 ///====================== Vec2 Shape ======================
 impl<T> Shape for Vec2<T> {
     #[inline(always)]
-    fn shape(&self) -> ShapeDescriptor {
-        ShapeDescriptor::from(vec![2].into_boxed_slice())
+    fn shape(&self) -> Cow<ShapeDescriptor> {
+        Cow::Owned(ShapeDescriptor::from(vec![2].into_boxed_slice()))
     }
 
     #[inline(always)]
@@ -25,7 +27,6 @@ impl<T> Shape for Vec2<T> {
     fn rank(&self) -> usize {
         1
     }
-
 }
 
 ///====================== Vec2 Neg ======================
