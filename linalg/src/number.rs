@@ -131,4 +131,8 @@ macro_rules! impl_real_and_natural {
     }
 }
 
+// both
 impl_real_and_natural![f64];
+
+// natural only
+impl_natural![i32, i64, i128];

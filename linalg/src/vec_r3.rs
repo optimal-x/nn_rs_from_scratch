@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use crate::shape::{Shape, ShapeDescriptor};
 
 ///====================== Vec3 ======================
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Vec3<T>([T; 3]);
 impl<T> Vec3<T> {
     pub fn new(x: T, y: T, z: T) -> Self {
@@ -14,7 +14,7 @@ impl<T> Vec3<T> {
 ///====================== Vec3 Shape ======================
 impl<T> Shape for Vec3<T> {
     fn shape(&self) -> Cow<ShapeDescriptor> {
-        Cow::Owned(ShapeDescriptor::from(vec![3].into_boxed_slice()))
+        Cow::Owned(ShapeDescriptor(Box::new([3])))
     }
 
     fn hypervolume(&self) -> usize {

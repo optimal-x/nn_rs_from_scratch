@@ -21,9 +21,10 @@ pub mod concrete_transformers;
 use crate::shape::Shape;
 use std::borrow::Cow;
 
+
 // ======================= boxed_slice_from_fn_uninit =======================
 ///.
-fn boxed_slice_from_fn<T, F>(size: usize, f: F) -> Box<[T]>
+fn slice_from_fn<T, F>(size: usize, f: F) -> Box<[T]>
 where
     F: Fn(usize) -> T,
 {
@@ -32,7 +33,7 @@ where
 
 // ======================= boxed_slice_from_fn_uninit =======================
 /// .
-pub fn boxed_slice_from_fn_uninit<T, F>(size: usize, f: F) -> Box<[T]>
+pub fn slice_from_fn_uninit<T, F>(size: usize, f: F) -> Box<[T]>
 where
     F: Fn(usize) -> T,
 {
@@ -47,7 +48,7 @@ where
 
 // ======================= default_boxed_slice =======================
 /// .
-pub fn default_boxed_slice<T: Default>(size: usize) -> Box<[T]> {
+pub fn default_slice<T: Default>(size: usize) -> Box<[T]> {
     let mut boxed_uninit = Box::<[T]>::new_uninit_slice(size);
     boxed_uninit.iter_mut().for_each(|slot| {
         slot.write(T::default());
@@ -63,7 +64,7 @@ pub fn default_boxed_slice<T: Default>(size: usize) -> Box<[T]> {
 #[deprecated]
 pub fn compute_strides(shape: &impl Shape) -> Box<[usize]> {
     let structure_shape = shape.shape();
-    let mut strides = default_boxed_slice(structure_shape.len());
+    let mut strides = default_slice(structure_shape.len());
     let mut stride = 1usize;
 
     for i in (0..structure_shape.len()).rev() {

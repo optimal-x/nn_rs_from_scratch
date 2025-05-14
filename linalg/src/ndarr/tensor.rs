@@ -1,17 +1,16 @@
-use crate::shape::{Shape, ShapeDescriptor};
 pub(crate) use super::transform::Transform;
+use crate::shape::{Shape, ShapeDescriptor};
 use std::{borrow::Cow, marker::PhantomData};
 
 // ======================= Container =======================
 /// .
 #[derive(Clone)]
-pub struct Tensor<'a, T>
-{
+pub struct Tensor<'a, T> {
     dtype: PhantomData<T>,
     transform: Option<&'a dyn Transform>,
     data: Box<[T]>,
     shape: ShapeDescriptor,
-    strides: Box<[usize]>
+    strides: Box<[usize]>,
 }
 
 impl<'a, T> Tensor<'a, T> {
@@ -22,10 +21,10 @@ impl<'a, T> Tensor<'a, T> {
             transform: None,
             data,
             shape,
-            strides
+            strides,
         }
     }
-    
+
     pub fn data(&self) -> &[T] {
         &self.data
     }
@@ -59,7 +58,7 @@ impl<T> Shape for Tensor<'_, T> {
         self.shape.rank()
     }
 
-    fn shape(&self) -> Cow<ShapeDescriptor >{
+    fn shape(&self) -> Cow<ShapeDescriptor> {
         Cow::Borrowed(&self.shape)
     }
 
@@ -67,7 +66,6 @@ impl<T> Shape for Tensor<'_, T> {
         self.shape.hypervolume()
     }
 }
-
 
 impl<T> std::ops::Deref for Tensor<'_, T> {
     type Target = [T];

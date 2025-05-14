@@ -15,7 +15,7 @@ impl<T> Vec2<T> {
 impl<T> Shape for Vec2<T> {
     #[inline(always)]
     fn shape(&self) -> Cow<ShapeDescriptor> {
-        Cow::Owned(ShapeDescriptor::from(vec![2].into_boxed_slice()))
+        Cow::Owned(ShapeDescriptor(Box::new([2])))
     }
 
     #[inline(always)]

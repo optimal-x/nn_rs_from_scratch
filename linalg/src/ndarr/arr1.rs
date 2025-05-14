@@ -5,7 +5,7 @@ use crate::{
 };
 use std::{borrow::Cow, iter::Sum, ops::*};
 
-///====================== Arr1 ======================
+//====================== Arr1 ======================
 #[derive(Clone)]
 pub struct Arr1<'a, T>(Tensor<'a, T>);
 
@@ -65,7 +65,7 @@ impl<T> Arr1<'_, T> {
     }
 }
 
-///====================== Arr1 Shape ======================
+//====================== Arr1 Shape ======================
 impl<T> Shape for Arr1<'_, T> {
     #[inline(always)]
     fn shape(&self) -> Cow<ShapeDescriptor> {
@@ -82,7 +82,7 @@ impl<T> Shape for Arr1<'_, T> {
     }
 }
 
-///====================== Arr1 Deref ======================
+//====================== Arr1 Deref ======================
 impl<'a, T> Deref for Arr1<'a, T> {
     type Target = Tensor<'a, T>;
 
@@ -91,14 +91,14 @@ impl<'a, T> Deref for Arr1<'a, T> {
     }
 }
 
-///====================== Arr1 DerefMut ======================
+//====================== Arr1 DerefMut ======================
 impl<T> DerefMut for Arr1<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
-///====================== Arr1 From<Vec<U>> ======================
+//====================== Arr1 From<Vec<T>> ======================
 impl<T> From<Vec<T>> for Arr1<'_, T> {
     #[inline]
     fn from(value: Vec<T>) -> Self {
@@ -106,7 +106,15 @@ impl<T> From<Vec<T>> for Arr1<'_, T> {
     }
 }
 
-///====================== Arr1 Index ======================
+//====================== Arr1 From<Box<[T]> ======================
+impl<T> From<Box<[T]>> for Arr1<'_, T> {
+    #[inline]
+    fn from(value: Box<[T]>) -> Self {
+        Self::new(value)
+    }
+}
+
+//====================== Arr1 Index ======================
 impl<T> Index<[usize; 1]> for Arr1<'_, T> {
     type Output = T;
 

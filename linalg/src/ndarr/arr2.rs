@@ -1,7 +1,7 @@
 
 use crate::{
     ndarr::transform::{
-        compute_flat_index, default_boxed_slice,
+        compute_flat_index, default_slice,
     },
     number::RealFuncs,
     shape::{Shape, ShapeDescriptor},
@@ -45,7 +45,7 @@ impl<T> Arr2<'_, T> {
             "[[linalg]] Matrix multiplication dimensions mismatch"
         );
 
-        let mut buff: Box<[T]> = default_boxed_slice(m * p);
+        let mut buff: Box<[T]> = default_slice(m * p);
         let strides = self.strides();
 
         for i in 0..m {
@@ -77,7 +77,7 @@ impl<T> Arr2<'_, T> {
 
         let (m, n) = (shape[0], shape[1]);
 
-        let mut buff: Box<[T]> = default_boxed_slice(m * n);
+        let mut buff: Box<[T]> = default_slice(m * n);
         let strides = self.strides();
         for i in 0..m {
             for j in 0..n {

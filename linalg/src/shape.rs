@@ -1,6 +1,6 @@
 use std::{borrow::Cow, ops::Deref};
 
-use crate::ndarr::transform::default_boxed_slice;
+use crate::ndarr::transform::default_slice;
 
 // ======================= Shape =======================
 pub trait Shape {
@@ -16,7 +16,7 @@ pub trait Shape {
 
     fn compute_strides(&self) -> Box<[usize]> {
         let structure_shape = self.shape();
-        let mut strides = default_boxed_slice(structure_shape.len());
+        let mut strides = default_slice(structure_shape.len());
         let mut stride = 1usize;
 
         for i in (0..structure_shape.len()).rev() {

@@ -1,6 +1,6 @@
 use super::vec_r2::Vec2;
 use crate::ndarr::arr1::Arr1;
-use crate::ndarr::device::Device;
+use crate::slice;
 
 #[test]
 pub(self) fn test_add() {
@@ -25,35 +25,32 @@ pub(self) fn test_mul() {
 
 #[test]
 pub(self) fn test_arr1_deref() {
-    let arr1 = Arr1::from(vec![0.0; 10]);
+    let arr1 = Arr1::new(slice![0.0; 10]);
     assert_eq!(&0.0, &(*arr1)[0]);
     // test deref coercion as well
-    assert_eq!(&0.0, &arr1[0]);
-}
-
-#[test]
-pub(self) fn test_arr1_get() {
-    let arr1 = Arr1::from(vec![0.0; 10]);
-    assert_eq!(Some(&0.0), arr1[&[0usize]]);
-    assert_eq!(Some(&0.0), arr1[&[2usize]]);
-    assert_eq!(Some(&0.0), arr1[&[0usize]]);
+    assert_eq!(&0.0, &arr1[[0]]);
 }
 
 #[test]
 pub(self) fn test_arr1_distance() {
     // immitating vec2 for legibility
-    let arr_0 = Arr1::from(vec![-1.0, 0.0]);
-    let arr_1 = Arr1::from(vec![0.0, -0.0]);
+    let arr_0 = Arr1::new(slice![-1.0, 0.0]);
+    let arr_1 = Arr1::new(slice![0.0, -0.0]);
     let dist = arr_0.distance(&arr_1);
-    assert_eq!((1.0_f64), dist);
+    assert_eq!(1.0, dist);
 
-    let arr_0 = Arr1::from(vec![3.0, 4.0]);
-    let arr_1 = Arr1::from(vec![3.0, 0.0]);
+    let arr_0 = Arr1::new(slice![3.0, 4.0]);
+    let arr_1 = Arr1::new(slice![3.0, 0.0]);
     let dist = arr_0.distance(&arr_1);
-    assert_eq!((4.0_f64), dist);
+    assert_eq!(4.0, dist);
 
-    let arr_0 = Arr1::from(vec![3.0, 4.0]);
-    let arr_1 = Arr1::from(vec![4.0, 3.0]);
+    let arr_0 = Arr1::new(slice![3.0, 4.0]);
+    let arr_1 = Arr1::new(slice![4.0, 3.0]);
     let dist = arr_0.distance(&arr_1);
-    assert_eq!((2.0_f64).sqrt(), dist);
+    assert_eq!(2.0_f64.sqrt(), dist);
+    
+    let arr_0 = Arr1::new(slice![1.0; 100]);
+    let arr_1 = Arr1::new(slice![5.0; 100]);
+    let dist = arr_0.distance(&arr_1);
+    assert_eq!(40.0, dist);
 }
