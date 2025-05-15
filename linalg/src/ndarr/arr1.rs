@@ -1,3 +1,4 @@
+use crate::ndarr::tensor::TensorAccess;
 use super::{tensor::Tensor, transform::compute_flat_index};
 use crate::{
     number::RealFuncs,
@@ -70,7 +71,7 @@ impl<T> Shape for Arr1<'_, T> {
     #[inline(always)]
     fn shape(&self) -> Cow<ShapeDescriptor> {
         self.0.shape()
-   }
+    }
 
     #[inline(always)]
     fn hypervolume(&self) -> usize {

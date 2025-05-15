@@ -29,6 +29,9 @@ pub(self) fn test_arr1_deref() {
     assert_eq!(&0.0, &(*arr1)[0]);
     // test deref coercion as well
     assert_eq!(&0.0, &arr1[[0]]);
+
+    let arr1 = Arr1::new(slice![3.0; 100]);
+    assert_eq!(3.0, arr1[[50]]);
 }
 
 #[test]
@@ -48,7 +51,7 @@ pub(self) fn test_arr1_distance() {
     let arr_1 = Arr1::new(slice![4.0, 3.0]);
     let dist = arr_0.distance(&arr_1);
     assert_eq!(2.0_f64.sqrt(), dist);
-    
+
     let arr_0 = Arr1::new(slice![1.0; 100]);
     let arr_1 = Arr1::new(slice![5.0; 100]);
     let dist = arr_0.distance(&arr_1);

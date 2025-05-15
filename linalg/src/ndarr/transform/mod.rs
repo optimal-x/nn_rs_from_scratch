@@ -18,18 +18,8 @@ pub mod concrete_transformers;
 /// // but in memory its still the same.
 /// tensor.reshape(StructureShape::<3>::from([1,2,3]));
 /// ```
-use crate::shape::Shape;
+use crate::shape::{Shape, ShapeDescriptor};
 use std::borrow::Cow;
-
-
-// ======================= boxed_slice_from_fn_uninit =======================
-///.
-fn slice_from_fn<T, F>(size: usize, f: F) -> Box<[T]>
-where
-    F: Fn(usize) -> T,
-{
-    (0..size).map(f).collect::<Vec<T>>().into_boxed_slice()
-}
 
 // ======================= boxed_slice_from_fn_uninit =======================
 /// .
@@ -114,8 +104,8 @@ pub trait Transform {
 
     /// Maps a flat index back to a logical index (e.g., [i, j, k]) if reversible.
     fn to_logical(&self, flat_index: usize) -> Box<[usize]> {
-        let strides = self.strides();
-        let shape = self.shape();
+        let strides = self.out_strides();
+        let shape = self.out_shape();
         let rank = strides.len();
 
         let mut uninit_box = Box::<[usize]>::new_uninit_slice(rank);
@@ -130,8 +120,27 @@ pub trait Transform {
     }
 
     /// Returns the logical shape after the transform.
-    fn shape(&self) -> &[usize];
+    fn out_shape(&self) -> Cow<ShapeDescriptor>;
 
     /// Returns the logical strides used for index computation.
-    fn strides(&self) -> Cow<[usize]>;
+    fn out_strides(&self) -> Cow<[usize]>;
+}
+
+// ======================= Transform =======================
+/// .
+pub trait IndexAccess<T> {
+    fn get<'a>(&self, buffer: &'a [T], logical: &[usize]) -> Option<&'a T>;
+    fn get_mut<'a>(&self, buffer: &'a mut [T], logical: &[usize]) -> Option<&'a mut T>;
+}
+
+// Generic implementation of IndexAccess for all types that impl transform
+impl<T, U: Transform> IndexAccess<T> for U {
+    fn get<'a>(&self, buffer: &'a [T], logical: &[usize]) -> Option<&'a T> {
+        buffer.get(self.to_flat(logical))
+    }
+
+    fn get_mut<'a>(&self, buffer: &'a mut [T], logical: &[usize]) -> Option<&'a mut T> {
+        let idx = self.to_flat(logical);
+        buffer.get_mut(idx)
+    }
 }

@@ -1,8 +1,6 @@
-
+use crate::ndarr::tensor::TensorAccess;
 use crate::{
-    ndarr::transform::{
-        compute_flat_index, default_slice,
-    },
+    ndarr::transform::{compute_flat_index, default_slice},
     number::RealFuncs,
     shape::{Shape, ShapeDescriptor},
 };
@@ -13,12 +11,14 @@ use super::tensor::Tensor;
 //====================== Arr2 ======================
 pub struct Arr2<'a, T>(Tensor<'a, T>);
 
-
 impl<T> Arr2<'_, T> {
     pub fn new(data: Box<[T]>, shape: (usize, usize)) -> Self {
-        Self(Tensor::new(data, ShapeDescriptor(Box::new([shape.0, shape.1]))))
+        Self(Tensor::new(
+            data,
+            ShapeDescriptor(Box::new([shape.0, shape.1])),
+        ))
     }
-    
+
     #[inline]
     pub fn rows(&self) -> usize {
         self.shape()[0]
@@ -86,14 +86,14 @@ impl<T> Arr2<'_, T> {
                 buff[flat] = self[[i, j]] + rhs[[i, j]];
             }
         }
-        
-        Arr2::new(buff, (m,n))
+
+        Arr2::new(buff, (m, n))
     }
 }
 
 ///====================== Arr2 Shape ======================
 impl<T> Shape for Arr2<'_, T> {
-    fn shape(&self) -> Cow<ShapeDescriptor >{
+    fn shape(&self) -> Cow<ShapeDescriptor> {
         self.0.shape()
     }
 
@@ -115,7 +115,7 @@ impl<'a, T> Deref for Arr2<'a, T> {
         &self.0
     }
 }
- 
+
 ///====================== Arr2 DerefMut ======================
 impl<T> DerefMut for Arr2<'_, T> {
     #[inline]
@@ -153,7 +153,7 @@ where
     T: Add<Output = T>,
     T: RealFuncs<T>,
     T: Clone + Copy,
-    T: Default
+    T: Default,
 {
     type Output = Arr2<'a, T>;
     fn add(self, rhs: Self) -> Self::Output {

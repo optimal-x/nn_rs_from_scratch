@@ -34,7 +34,7 @@ pub struct ShapeDescriptor(pub Box<[usize]>);
 
 /// the structure of a shape is infact a shape.
 impl Shape for ShapeDescriptor {
-    fn shape(&self) -> Cow<ShapeDescriptor>{
+    fn shape(&self) -> Cow<ShapeDescriptor> {
         Cow::Borrowed(self)
     }
 

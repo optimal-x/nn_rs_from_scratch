@@ -1,27 +1,30 @@
 // conrete_transform.rs
-use super::{compute_flat_index, Transform, TransformError};
-use crate::shape::{ShapeDescriptor, Shape};
-use std::borrow::Cow;
+use super::{
+    Transform, TransformError, compute_flat_index, matching_hypervolume,
+};
+use crate::{ndarr::tensor::TensorAccess, shape::{Shape, ShapeDescriptor}};
+use std::{borrow::Cow, ops::Index};
 
 // ======================= IdentityTransform =======================
 ///
 /// A fundamental Transform that provides actions for describing behaviour
 /// related to a tensors shape and indices
-pub struct IdentityTransform(pub ShapeDescriptor);
+
+type Strides = Box<[usize]>;
+
+pub struct IdentityTransform(pub ShapeDescriptor, pub Strides);
 
 impl Transform for IdentityTransform {
     fn to_flat(&self, logical: &[usize]) -> usize {
-        let strides = self.0.compute_strides();
-        compute_flat_index(logical, &strides)
+        compute_flat_index(logical, &self.1)
     }
 
-    fn shape(&self) -> &[usize] {
-        &self.0
+    fn out_shape(&self) -> Cow<ShapeDescriptor> {
+        Cow::Borrowed(&self.0)
     }
 
-    fn strides(&self) -> Cow<[usize]> {
-        let strides = self.0.compute_strides();
-        Cow::Owned(strides.into())
+    fn out_strides(&self) -> Cow<[usize]> {
+        Cow::Borrowed(&self.1)
     }
 }
 
@@ -41,49 +44,50 @@ impl Transform for ChainedTransforms<'_> {
         todo!()
     }
 
-    fn shape(&self) -> &[usize] {
+    fn out_strides(&self) -> Cow<[usize]> {
         todo!()
     }
 
-    fn strides(&self) -> Cow<[usize]> {
+    fn out_shape(&self) -> Cow<ShapeDescriptor> {
         todo!()
     }
 }
 
 // ======================= ReshapeTransform =======================
 /// .
-pub struct ReshapeTransform<'a> {
-    src_shape: &'a ShapeDescriptor,
+pub struct ReshapeTransform {
     dst_shape: ShapeDescriptor,
-    strides: Box<[usize]>, // needed for computing to out_shape logical from flat index.
+    out_strides: Strides, // needed for computing to out_shape logical from flat index.
 }
 
-impl<'a> ReshapeTransform<'a> {
-    pub fn new(src: &'a ShapeDescriptor, dst: ShapeDescriptor) -> Result<Self, TransformError> {
-        let strides = src.compute_strides();
+impl ReshapeTransform {
+    pub fn new(
+        src: &ShapeDescriptor,
+        dst: ShapeDescriptor,
+    ) -> Result<Self, TransformError> {
+        assert!(
+            matching_hypervolume(&dst, src).is_ok(),
+            "Hypervolume Mismatch while reshaping"
+        );
+        let out_strides = dst.compute_strides();
         Ok(Self {
-            src_shape: src,
             dst_shape: dst,
-            strides
+            out_strides,
         })
     }
 }
 
 // ======================= ReshapeTransform Transform =======================
-impl Transform for ReshapeTransform<'_> {
+impl Transform for ReshapeTransform {
     fn to_flat(&self, logical: &[usize]) -> usize {
-        todo!()
+        compute_flat_index(logical, &self.dst_shape)
     }
 
-    fn to_logical(&self, flat_index: usize) -> Box<[usize]> {
-        todo!()
+    fn out_shape(&self) -> Cow<ShapeDescriptor> {
+        Cow::Borrowed(&self.dst_shape)
     }
 
-    fn shape(&self) -> &[usize] {
-        &self.dst_shape
-    }
-
-    fn strides(&self) -> Cow<[usize]> {
-        Cow::Borrowed(&self.strides)
+    fn out_strides(&self) -> Cow<[usize]> {
+        Cow::Borrowed(&self.out_strides)
     }
 }

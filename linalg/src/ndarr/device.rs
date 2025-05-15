@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use super::tensor::Tensor;
 
 pub enum DeviceError {
@@ -19,7 +21,7 @@ pub trait Device<'a> {
 
 // ======================= DeviceBackend =======================
 pub struct DeviceTensorHandle<T> {
-    temp: T, // TODO remove and figure out a good use for the type LOL
+    marker: PhantomData<T>
 }
 
 #[derive(Default)]
