@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use crate::shape::{Shape, ShapeDescriptor};
+use crate::{ndarr::{X, Y, Z}, shape::{Shape, ShapeDescriptor}};
 
 ///====================== Vec3 ======================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -35,7 +35,7 @@ where
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        Self::new(-self.0[0], -self.0[1], -self.0[2])
+        Self::new(-self[X], -self[Y], -self[Z])
     }
 }
 
@@ -48,9 +48,9 @@ where
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        let new_x = self.0[0] + rhs.0[0];
-        let new_y = self.0[1] + rhs.0[1];
-        let new_z = self.0[2] + rhs.0[2];
+        let new_x = self[X] + rhs[X];
+        let new_y = self[Y] + rhs[Y];
+        let new_z = self[Z] + rhs[Z];
         Vec3::new(new_x, new_y, new_z)
     }
 }
@@ -66,9 +66,9 @@ where
 
     /// DOT product
     fn mul(self, rhs: Self) -> Self::Output {
-        let new_x = self.0[0] * rhs.0[0];
-        let new_y = self.0[1] * rhs.0[1];
-        let new_z = self.0[2] * rhs.0[2];
+        let new_x = self[X] * rhs[X];
+        let new_y = self[Y] * rhs[Y];
+        let new_z = self[Z] * rhs[Z];
         new_x + new_y + new_z
     }
 }
@@ -84,5 +84,49 @@ where
 
     fn sub(self, rhs: Self) -> Self::Output {
         self + (-rhs)
+    }
+}
+
+//====================== Vec2 Index ======================
+impl<T> std::ops::Index<X> for Vec3<T> {
+    type Output = T;
+
+    fn index(&self, _index: X) -> &Self::Output {
+        &self.0[0]
+    }
+}
+
+impl<T> std::ops::Index<Y> for Vec3<T> {
+    type Output = T;
+
+    fn index(&self, _index: Y) -> &Self::Output {
+        &self.0[1]
+    }
+}
+
+impl<T> std::ops::Index<Z> for Vec3<T> {
+    type Output = T;
+
+    fn index(&self, _index: Z) -> &Self::Output {
+        &self.0[2]
+    }
+}
+
+//====================== Vec2 IndexMut ======================
+impl<T> std::ops::IndexMut<X> for Vec3<T> {
+    fn index_mut(&mut self, _index: X) -> &mut Self::Output {
+        &mut self.0[0]
+    }
+}
+
+impl<T> std::ops::IndexMut<Y> for Vec3<T> {
+    fn index_mut(&mut self, _index: Y) -> &mut Self::Output {
+        &mut self.0[1]
+    }
+}
+
+impl<T> std::ops::IndexMut<Z> for Vec3<T> {
+    fn index_mut(&mut self, _index: Z) -> &mut Self::Output {
+        &mut self.0[2]
     }
 }

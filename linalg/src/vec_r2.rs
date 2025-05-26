@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 
-use crate::shape::{Shape, ShapeDescriptor};
+use crate::{ndarr::{X, Y}, shape::{Shape, ShapeDescriptor}};
 
-///====================== Vec2 ======================
+//====================== Vec2 ======================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Vec2<T>([T; 2]);
 impl<T> Vec2<T> {
@@ -11,7 +11,7 @@ impl<T> Vec2<T> {
     }
 }
 
-///====================== Vec2 Shape ======================
+//====================== Vec2 Shape ======================
 impl<T> Shape for Vec2<T> {
     #[inline(always)]
     fn shape(&self) -> Cow<ShapeDescriptor> {
@@ -29,7 +29,7 @@ impl<T> Shape for Vec2<T> {
     }
 }
 
-///====================== Vec2 Neg ======================
+//====================== Vec2 Neg ======================
 impl<T> std::ops::Neg for Vec2<T>
 where
     T: Clone + Copy,
@@ -42,7 +42,7 @@ where
     }
 }
 
-///====================== Vec2 Add ======================
+//====================== Vec2 Add ======================
 impl<T> std::ops::Add for Vec2<T>
 where
     T: std::ops::Add<Output = T>,
@@ -57,7 +57,7 @@ where
     }
 }
 
-///====================== Vec2 Mul ======================
+//====================== Vec2 Mul ======================
 impl<T> std::ops::Mul for Vec2<T>
 where
     T: std::ops::Mul<Output = T>,
@@ -74,7 +74,7 @@ where
     }
 }
 
-///====================== Vec2 Sub ======================
+//====================== Vec2 Sub ======================
 impl<T> std::ops::Sub for Vec2<T>
 where
     T: std::ops::Add<Output = T>,
@@ -85,5 +85,35 @@ where
 
     fn sub(self, rhs: Self) -> Self::Output {
         self + (-rhs)
+    }
+}
+
+//====================== Vec2 Index ======================
+impl<T> std::ops::Index<X> for Vec2<T> {
+    type Output = T;
+
+    fn index(&self, _index: X) -> &Self::Output {
+        &self.0[0]
+    }
+}
+
+impl<T> std::ops::Index<Y> for Vec2<T> {
+    type Output = T;
+
+    fn index(&self, _index: Y) -> &Self::Output {
+        &self.0[1]
+    }
+}
+
+//====================== Vec2 IndexMut ======================
+impl<T> std::ops::IndexMut<X> for Vec2<T> {
+    fn index_mut(&mut self, _index: X) -> &mut Self::Output {
+        &mut self.0[0]
+    }
+}
+
+impl<T> std::ops::IndexMut<Y> for Vec2<T> {
+    fn index_mut(&mut self, _index: Y) -> &mut Self::Output {
+        &mut self.0[1]
     }
 }

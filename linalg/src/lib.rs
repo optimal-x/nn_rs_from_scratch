@@ -8,7 +8,7 @@ pub mod vec_r2;
 pub mod vec_r3;
 
 #[macro_export]
-macro_rules! slice {
+macro_rules! boxed_slice {
     ($elem:expr; $n:expr) => (
         Box::new([$elem; $n])
     );

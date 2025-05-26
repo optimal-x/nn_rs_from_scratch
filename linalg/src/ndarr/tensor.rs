@@ -1,7 +1,11 @@
-use super::transform::compute_flat_index;
 pub(crate) use super::transform::Transform;
+use super::transform::compute_flat_index;
 use crate::shape::{Shape, ShapeDescriptor};
-use std::{borrow::Cow, marker::PhantomData, ops::{Index, IndexMut}};
+use std::{
+    borrow::Cow,
+    marker::PhantomData,
+    ops::{Index, IndexMut},
+};
 
 // ======================= Container =======================
 /// .
@@ -31,6 +35,7 @@ impl<'a, T> Tensor<'a, T> {
 pub trait TensorAccess<'a, T> {
     fn data(&self) -> &[T];
     fn strides(&self) -> &[usize];
+    fn data_mut(&mut self) -> &mut [T];
 
     fn transform(&self) -> Option<&dyn Transform>;
 
@@ -41,7 +46,7 @@ pub trait TensorAccess<'a, T> {
     /// This means the a transform can technically be used on another tensor
     /// without needing a tensor to start with. Also meaning that you can
     /// do arbirary shaping and manipulation without a Tensor.
-    fn set_transform(&mut self, transform: &'a dyn Transform); 
+    fn set_transform(&mut self, transform: &'a dyn Transform);
 }
 
 impl<'a, T> TensorAccess<'a, T> for Tensor<'a, T> {
@@ -56,9 +61,13 @@ impl<'a, T> TensorAccess<'a, T> for Tensor<'a, T> {
     fn transform(&self) -> Option<&dyn Transform> {
         self.transform
     }
- 
+
     fn set_transform(&mut self, transform: &'a dyn Transform) {
         self.transform = Some(transform);
+    }
+
+    fn data_mut(&mut self) -> &mut [T] {
+        &mut self.data
     }
 }
 
@@ -97,8 +106,6 @@ impl<T> std::ops::DerefMut for Tensor<'_, T> {
     }
 }
 
-
-
 // ======================= impl Index =======================
 impl<'a, T> Index<&[usize]> for Tensor<'a, T> {
     type Output = T;
@@ -123,4 +130,3 @@ impl<'a, T> IndexMut<&[usize]> for Tensor<'a, T> {
         &mut self.data[flat]
     }
 }
-

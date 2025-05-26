@@ -168,7 +168,7 @@ impl<T> Index<[usize; 2]> for Arr2<'_, T> {
     fn index(&self, logical: [usize; 2]) -> &Self::Output {
         let strides = self.strides();
         let flat = compute_flat_index(&logical, strides);
-        &self.0[flat]
+        &self.0.data()[flat]
     }
 }
 
@@ -177,6 +177,6 @@ impl<T> IndexMut<[usize; 2]> for Arr2<'_, T> {
     fn index_mut(&mut self, logical: [usize; 2]) -> &mut Self::Output {
         let strides = self.strides();
         let flat = compute_flat_index(&logical, strides);
-        &mut self.0[flat]
+        &mut self.0.data_mut()[flat]
     }
 }
