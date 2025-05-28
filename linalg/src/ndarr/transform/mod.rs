@@ -88,12 +88,66 @@ pub fn matching_hypervolume(
     }
 }
 
+// ======================= validate_permutation_and_shape =======================
+/// .
+/// # Errors
+///
+/// This function will return an error if:
+/// - permutation length does not match the input shape length
+/// - any of the permutations are out of bounds of the shape dimensions
+/// - there is a duplicate index within the permutation
+pub fn validate_permutation_and_shape(
+    permutation: &[usize],
+    input_shape: &[usize],
+) -> Result<ShapeDescriptor, TransformError> {
+    let rank = input_shape.len();
+
+    if permutation.len() != rank {
+        return Err(TransformError::Permute(PermutationError::WrongLength {
+            expected: rank,
+            actual: permutation.len(),
+        }));
+    }
+
+    let mut seen = vec![false; rank];
+
+    for &p in permutation {
+        if p >= rank {
+            return Err(TransformError::Permute(
+                PermutationError::OutOfBounds { value: p, rank },
+            ));
+        }
+        if seen[p] {
+            return Err(TransformError::Permute(PermutationError::Duplicate {
+                value: p,
+            }));
+        }
+        seen[p] = true;
+    }
+
+    let output_shape: Box<[usize]> = permutation
+        .iter()
+        .map(|&i| input_shape[i])
+        .collect::<Vec<usize>>()
+        .into_boxed_slice();
+    Ok(ShapeDescriptor(output_shape))
+}
+
 // ======================= TransformError =======================
 /// .
+#[derive(Debug)]
+pub enum PermutationError {
+    WrongLength { expected: usize, actual: usize },
+    OutOfBounds { value: usize, rank: usize },
+    Duplicate { value: usize },
+}
+
+#[derive(Debug)]
 pub enum TransformError {
     ReshapeError,
     MisMatchHypervolume,
     Error,
+    Permute(PermutationError)
 }
 
 // ======================= Transform =======================
@@ -124,6 +178,7 @@ pub trait Transform {
 
     /// Returns the logical strides used for index computation.
     fn out_strides(&self) -> Cow<[usize]>;
+    
 }
 
 // ======================= Transform =======================

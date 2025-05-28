@@ -1,9 +1,9 @@
 // conrete_transform.rs
 use super::{
-    Transform, TransformError, compute_flat_index, matching_hypervolume,
+    compute_flat_index, matching_hypervolume, validate_permutation_and_shape, PermutationError, Transform, TransformError
 };
-use crate::{ndarr::tensor::TensorAccess, shape::{Shape, ShapeDescriptor}};
-use std::{borrow::Cow, ops::Index};
+use crate::shape::{Shape, ShapeDescriptor};
+use std::borrow::Cow;
 
 // ======================= IdentityTransform =======================
 ///
@@ -28,35 +28,10 @@ impl Transform for IdentityTransform {
     }
 }
 
-// ======================= ChainedTransforms =======================
-/// .
-pub struct ChainedTransforms<'a> {
-    pub stages: Vec<&'a dyn Transform>,
-}
-
-// ======================= ChainedTransforms Transform =======================
-impl Transform for ChainedTransforms<'_> {
-    fn to_flat(&self, logical: &[usize]) -> usize {
-        todo!()
-    }
-
-    fn to_logical(&self, flat_index: usize) -> Box<[usize]> {
-        todo!()
-    }
-
-    fn out_strides(&self) -> Cow<[usize]> {
-        todo!()
-    }
-
-    fn out_shape(&self) -> Cow<ShapeDescriptor> {
-        todo!()
-    }
-}
-
 // ======================= ReshapeTransform =======================
 /// .
 pub struct ReshapeTransform {
-    dst_shape: ShapeDescriptor,
+    out_shape: ShapeDescriptor,
     out_strides: Strides, // needed for computing to out_shape logical from flat index.
 }
 
@@ -71,7 +46,7 @@ impl ReshapeTransform {
         );
         let out_strides = dst.compute_strides();
         Ok(Self {
-            dst_shape: dst,
+            out_shape: dst,
             out_strides,
         })
     }
@@ -80,14 +55,50 @@ impl ReshapeTransform {
 // ======================= ReshapeTransform Transform =======================
 impl Transform for ReshapeTransform {
     fn to_flat(&self, logical: &[usize]) -> usize {
-        compute_flat_index(logical, &self.dst_shape)
+        compute_flat_index(logical, &self.out_shape)
     }
 
     fn out_shape(&self) -> Cow<ShapeDescriptor> {
-        Cow::Borrowed(&self.dst_shape)
+        Cow::Borrowed(&self.out_shape)
     }
 
     fn out_strides(&self) -> Cow<[usize]> {
         Cow::Borrowed(&self.out_strides)
+    }
+}
+
+// ======================= TransposeTransform =======================
+pub struct TransposeTransform {
+    reshape: ReshapeTransform,
+    permutations: Box<[usize]>,
+}
+
+
+impl TransposeTransform {
+    pub fn new(
+        src: &ShapeDescriptor,
+        permutation: Box<[usize]>,
+    ) -> Result<Self, TransformError> {
+        let output_shape = validate_permutation_and_shape(&permutation, &src)?;
+
+        Ok(Self {
+            reshape: ReshapeTransform::new(src, output_shape)?,
+            permutations: permutation,
+        })
+    }
+}
+
+// ======================= TransposeTransform Transform =======================
+impl Transform for TransposeTransform {
+    fn to_flat(&self, logical: &[usize]) -> usize {
+        todo!()
+    }
+
+    fn out_shape(&self) -> Cow<ShapeDescriptor> {
+        todo!()
+    }
+
+    fn out_strides(&self) -> Cow<[usize]> {
+        todo!()
     }
 }

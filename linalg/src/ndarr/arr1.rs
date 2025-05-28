@@ -10,7 +10,7 @@ use std::{borrow::Cow, iter::Sum, ops::*};
 #[derive(Clone)]
 pub struct Arr1<'a, T>(Tensor<'a, T>);
 
-impl<T> Arr1<'_, T> {
+impl<T: Clone> Arr1<'_, T> {
     pub fn new(data: Box<[T]>) -> Self {
         let size = data.len();
         Self(Tensor::new(data, ShapeDescriptor(Box::new([size]))))
@@ -100,7 +100,7 @@ impl<T> DerefMut for Arr1<'_, T> {
 }
 
 //====================== Arr1 From<Vec<T>> ======================
-impl<T> From<Vec<T>> for Arr1<'_, T> {
+impl<T: Clone> From<Vec<T>> for Arr1<'_, T> {
     #[inline]
     fn from(value: Vec<T>) -> Self {
         Self::new(value.into())
@@ -108,7 +108,7 @@ impl<T> From<Vec<T>> for Arr1<'_, T> {
 }
 
 //====================== Arr1 From<Box<[T]> ======================
-impl<T> From<Box<[T]>> for Arr1<'_, T> {
+impl<T: Clone> From<Box<[T]>> for Arr1<'_, T> {
     #[inline]
     fn from(value: Box<[T]>) -> Self {
         Self::new(value)

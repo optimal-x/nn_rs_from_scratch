@@ -11,7 +11,7 @@ use super::tensor::Tensor;
 //====================== Arr2 ======================
 pub struct Arr2<'a, T>(Tensor<'a, T>);
 
-impl<T> Arr2<'_, T> {
+impl<T: Clone> Arr2<'_, T> {
     pub fn new(data: Box<[T]>, shape: (usize, usize)) -> Self {
         Self(Tensor::new(
             data,
@@ -127,7 +127,7 @@ impl<T> DerefMut for Arr2<'_, T> {
 ///====================== Arr2 From<Vec<Vec<T>>>======================
 impl<T> From<Vec<Vec<T>>> for Arr2<'_, T> {
     #[inline]
-    fn from(value: Vec<Vec<T>>) -> Self {
+    fn from(_value: Vec<Vec<T>>) -> Self {
         todo!()
     }
 }

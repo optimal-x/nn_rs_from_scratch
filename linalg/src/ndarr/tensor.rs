@@ -18,7 +18,7 @@ pub struct Tensor<'a, T> {
     strides: Box<[usize]>,
 }
 
-impl<'a, T> Tensor<'a, T> {
+impl<'a, T: Clone> Tensor<'a, T> {
     pub fn new(data: Box<[T]>, shape: ShapeDescriptor) -> Self {
         let strides = shape.compute_strides();
         Self {
@@ -29,13 +29,36 @@ impl<'a, T> Tensor<'a, T> {
             strides,
         }
     }
+
+    pub fn commit(&mut self) -> bool {
+        if let Some(transform) = self.transform {
+            self.shape = transform.out_shape().into_owned();
+            self.strides = transform.out_strides().into_owned().into();
+            let original_data: Box<[T]> = self.data.clone();  // copy all original values to pivot.
+
+            // original_data remains unchanged throughout the mutation of self
+            original_data.into_iter().enumerate().for_each(
+                |(src_flat, element)| {
+                    let dst_logical = transform.to_logical(src_flat);
+                    let dst_flat = transform.to_flat(&dst_logical);
+                    self.data_mut()[dst_flat] = element;
+                },
+            );
+
+            self.transform = None; // reset the transform
+            return true;
+        }
+        false
+    }
 }
 
 // ======================= trait TensorAccess =======================
 pub trait TensorAccess<'a, T> {
     fn data(&self) -> &[T];
-    fn strides(&self) -> &[usize];
+
     fn data_mut(&mut self) -> &mut [T];
+
+    fn strides(&self) -> &[usize];
 
     fn transform(&self) -> Option<&dyn Transform>;
 
@@ -54,6 +77,10 @@ impl<'a, T> TensorAccess<'a, T> for Tensor<'a, T> {
         &self.data
     }
 
+    fn data_mut(&mut self) -> &mut [T] {
+        &mut self.data
+    }
+
     fn strides(&self) -> &[usize] {
         &self.strides
     }
@@ -64,10 +91,6 @@ impl<'a, T> TensorAccess<'a, T> for Tensor<'a, T> {
 
     fn set_transform(&mut self, transform: &'a dyn Transform) {
         self.transform = Some(transform);
-    }
-
-    fn data_mut(&mut self) -> &mut [T] {
-        &mut self.data
     }
 }
 
@@ -102,7 +125,7 @@ impl<T> std::ops::Deref for Tensor<'_, T> {
 // ======================= impl DerefMut =======================
 impl<T> std::ops::DerefMut for Tensor<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.data
+        self.data_mut()
     }
 }
 

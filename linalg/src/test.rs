@@ -61,8 +61,8 @@ pub(self) fn test_arr1_distance() {
 
 #[test]
 pub(self) fn test_vec2_index_using_x_y_structs() {
-    let v2 = Vec2::new(1, 2);
+    let v2 = Vec2::new(1.0f64, 2.0f64);
     let x = v2[X];
     let y = v2[Y];
-    assert_eq!((x, y), (1, 2));
+    assert_eq!((x, y), (1.0, 2.0));
 }
